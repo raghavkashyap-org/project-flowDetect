@@ -1,0 +1,11 @@
+metric,value
+parsed_rows,16137183
+mid_file_header_rows_dropped,0
+all_empty_rows_dropped,0
+missing_label_rows,0
+exact_duplicate_rows,437928
+duplicate_pct,2.7138
+distinct_dup_hashes,131531
+global_dedup_mode,full
+distinct_days_seen,15
+minutes_total,2.2

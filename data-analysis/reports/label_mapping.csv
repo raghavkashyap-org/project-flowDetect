@@ -1,0 +1,16 @@
+raw_label,canonical
+Benign,Benign
+DDOS attack-HOIC,DDOS attack-HOIC
+DDoS attacks-LOIC-HTTP,DDoS attacks-LOIC-HTTP
+DoS attacks-Hulk,DoS attacks-Hulk
+Bot,Bot
+FTP-BruteForce,FTP-BruteForce
+SSH-Bruteforce,SSH-Bruteforce
+Infilteration,Infilteration
+DoS attacks-SlowHTTPTest,DoS attacks-SlowHTTPTest
+DoS attacks-GoldenEye,DoS attacks-GoldenEye
+DoS attacks-Slowloris,DoS attacks-Slowloris
+DDOS attack-LOIC-UDP,DDOS attack-LOIC-UDP
+Brute Force -Web,Brute Force -Web
+Brute Force -XSS,Brute Force -XSS
+SQL Injection,SQL Injection

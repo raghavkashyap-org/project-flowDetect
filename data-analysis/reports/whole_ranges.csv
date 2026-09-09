@@ -1,0 +1,6 @@
+check,fail_count
+port_invalid,0
+protocol_invalid,0
+hour_invalid,0
+minute_invalid,0
+second_invalid,0

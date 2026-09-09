@@ -1,0 +1,148 @@
+t,label,count
+344,Benign,66830
+345,Benign,105065
+346,Benign,114472
+346,FTP-BruteForce,52898
+347,Benign,105162
+347,FTP-BruteForce,119487
+348,Benign,82449
+348,FTP-BruteForce,20969
+337,Benign,65044
+338,SSH-Bruteforce,120348
+338,Benign,49549
+339,SSH-Bruteforce,67241
+339,Benign,35347
+340,Benign,28286
+341,Benign,11599
+123,Benign,1
+199,Benign,1
+295,Benign,1
+297,Benign,5
+368,Benign,87007
+369,Benign,143753
+369,DoS attacks-GoldenEye,41507
+370,Benign,127314
+371,DoS attacks-Slowloris,10990
+371,Benign,136429
+372,Benign,107344
+361,Benign,105318
+362,Benign,90824
+363,Benign,73297
+364,Benign,75645
+365,Benign,41119
+370,DoS attacks-GoldenEye,1
+392,Benign,50
+393,Benign,111
+394,Benign,94
+394,DoS attacks-SlowHTTPTest,139890
+395,Benign,37
+396,Benign,53
+385,Benign,446427
+385,DoS attacks-Hulk,461912
+488,Benign,466919
+489,Benign,853986
+490,Benign,874547
+490,DDoS attacks-LOIC-HTTP,423621
+491,DDoS attacks-LOIC-HTTP,151773
+491,Benign,894855
+492,Benign,655810
+481,Benign,813118
+481,DDoS attacks-LOIC-HTTP,797
+482,Benign,815621
+483,Benign,824776
+484,Benign,801005
+485,Benign,303160
+486,Benign,6224
+487,Benign,3083
+512,Benign,145
+513,Benign,281
+514,Benign,1714
+514,DDOS attack-LOIC-UDP,1730
+505,Benign,25
+506,Benign,358668
+506,DDOS attack-HOIC,686012
+536,Benign,74082
+537,Benign,123715
+538,Benign,132404
+538,Brute Force -Web,161
+539,Brute Force -Web,88
+539,Benign,160536
+540,Benign,123086
+529,Benign,109970
+529,Brute Force -XSS,20
+530,Brute Force -XSS,59
+530,Benign,91156
+531,Benign,81281
+532,Benign,97263
+532,SQL Injection,31
+533,Benign,49101
+529,SQL Injection,2
+539,SQL Injection,1
+243,Benign,1
+276,Benign,1
+269,Benign,1
+267,Benign,1
+294,Benign,1
+289,Benign,1
+560,Benign,107379
+561,Benign,117512
+562,Benign,130344
+562,Brute Force -Web,346
+561,Brute Force -Web,2
+563,Brute Force -Web,14
+563,Benign,139985
+564,Benign,114212
+553,Brute Force -XSS,126
+553,Benign,104137
+554,Brute Force -XSS,25
+554,Benign,83185
+555,Benign,102895
+555,SQL Injection,50
+556,Benign,94005
+557,Benign,48647
+562,SQL Injection,3
+680,Benign,44144
+681,Benign,76598
+682,Benign,64772
+683,Benign,68384
+684,Benign,43432
+673,Benign,57934
+674,Benign,59160
+675,Benign,52196
+676,Benign,56596
+677,Benign,15450
+682,Infilteration,6978
+683,Infilteration,33254
+684,Infilteration,2152
+673,Infilteration,8333
+674,Infilteration,17519
+32,Benign,26837
+33,Benign,35192
+34,Benign,16454
+35,Benign,29566
+36,Benign,17814
+25,Benign,32144
+26,Benign,13902
+27,Benign,21228
+28,Benign,30929
+29,Benign,11712
+26,Infilteration,33617
+27,Infilteration,20249
+33,Infilteration,1270
+34,Infilteration,37267
+56,Benign,36704
+57,Benign,97399
+58,Benign,92213
+58,Bot,25648
+59,Bot,87412
+59,Benign,95371
+60,Bot,31840
+60,Benign,77646
+49,Bot,32146
+49,Benign,79543
+50,Bot,41585
+50,Benign,75517
+51,Bot,67560
+51,Benign,83417
+52,Benign,74936
+53,Benign,45588

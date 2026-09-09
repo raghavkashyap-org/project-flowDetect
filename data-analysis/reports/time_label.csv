@@ -1,0 +1,148 @@
+day,hour,raw_label,count
+20,11,Benign,894855
+20,10,Benign,874547
+20,9,Benign,853986
+20,3,Benign,824776
+20,2,Benign,815621
+20,1,Benign,813118
+20,4,Benign,801005
+21,2,DDOS attack-HOIC,686012
+20,12,Benign,655810
+20,8,Benign,466919
+16,1,DoS attacks-Hulk,461912
+16,1,Benign,446427
+20,10,DDoS attacks-LOIC-HTTP,423621
+21,2,Benign,358668
+20,5,Benign,303160
+22,11,Benign,160536
+20,11,DDoS attacks-LOIC-HTTP,151773
+15,9,Benign,143753
+23,11,Benign,139985
+16,10,DoS attacks-SlowHTTPTest,139890
+15,11,Benign,136429
+22,10,Benign,132404
+23,10,Benign,130344
+15,10,Benign,127314
+22,9,Benign,123715
+22,12,Benign,123086
+14,2,SSH-Bruteforce,120348
+14,11,FTP-BruteForce,119487
+23,9,Benign,117512
+14,10,Benign,114472
+23,12,Benign,114212
+22,1,Benign,109970
+23,8,Benign,107379
+15,12,Benign,107344
+15,1,Benign,105318
+14,11,Benign,105162
+14,9,Benign,105065
+23,1,Benign,104137
+23,3,Benign,102895
+2,9,Benign,97399
+22,4,Benign,97263
+2,11,Benign,95371
+23,4,Benign,94005
+2,10,Benign,92213
+22,2,Benign,91156
+15,2,Benign,90824
+2,11,Bot,87412
+15,8,Benign,87007
+2,3,Benign,83417
+23,2,Benign,83185
+14,12,Benign,82449
+22,3,Benign,81281
+2,1,Benign,79543
+2,12,Benign,77646
+28,9,Benign,76598
+15,4,Benign,75645
+2,2,Benign,75517
+2,4,Benign,74936
+22,8,Benign,74082
+15,3,Benign,73297
+28,11,Benign,68384
+2,3,Bot,67560
+14,3,SSH-Bruteforce,67241
+14,8,Benign,66830
+14,1,Benign,65044
+28,10,Benign,64772
+28,2,Benign,59160
+28,1,Benign,57934
+28,4,Benign,56596
+14,10,FTP-BruteForce,52898
+28,3,Benign,52196
+14,2,Benign,49549
+22,5,Benign,49101
+23,5,Benign,48647
+2,5,Benign,45588
+28,8,Benign,44144
+28,12,Benign,43432
+2,2,Bot,41585
+15,9,DoS attacks-GoldenEye,41507
+15,5,Benign,41119
+1,10,Infilteration,37267
+2,8,Benign,36704
+14,3,Benign,35347
+1,9,Benign,35192
+1,2,Infilteration,33617
+28,11,Infilteration,33254
+2,1,Bot,32146
+1,1,Benign,32144
+2,12,Bot,31840
+1,4,Benign,30929
+1,11,Benign,29566
+14,4,Benign,28286
+1,8,Benign,26837
+2,10,Bot,25648
+1,3,Benign,21228
+14,12,FTP-BruteForce,20969
+1,3,Infilteration,20249
+1,12,Benign,17814
+28,2,Infilteration,17519
+1,10,Benign,16454
+28,5,Benign,15450
+1,2,Benign,13902
+1,5,Benign,11712
+14,5,Benign,11599
+15,11,DoS attacks-Slowloris,10990
+28,1,Infilteration,8333
+28,10,Infilteration,6978
+20,6,Benign,6224
+20,7,Benign,3083
+28,12,Infilteration,2152
+21,10,DDOS attack-LOIC-UDP,1730
+21,10,Benign,1714
+1,9,Infilteration,1270
+20,1,DDoS attacks-LOIC-HTTP,797
+23,10,Brute Force -Web,346
+21,9,Benign,281
+22,10,Brute Force -Web,161
+21,8,Benign,145
+23,1,Brute Force -XSS,126
+16,9,Benign,111
+16,10,Benign,94
+22,11,Brute Force -Web,88
+22,2,Brute Force -XSS,59
+16,12,Benign,53
+16,8,Benign,50
+23,3,SQL Injection,50
+16,11,Benign,37
+22,4,SQL Injection,31
+21,1,Benign,25
+23,2,Brute Force -XSS,25
+22,1,Brute Force -XSS,20
+23,11,Brute Force -Web,14
+12,9,Benign,5
+23,10,SQL Injection,3
+22,1,SQL Injection,2
+23,9,Brute Force -Web,2
+5,3,Benign,1
+8,7,Benign,1
+12,7,Benign,1
+15,10,DoS attacks-GoldenEye,1
+22,11,SQL Injection,1
+10,3,Benign,1
+11,12,Benign,1
+11,5,Benign,1
+11,3,Benign,1
+12,6,Benign,1
+12,1,Benign,1

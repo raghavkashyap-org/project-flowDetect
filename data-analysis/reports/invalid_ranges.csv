@@ -1,0 +1,6 @@
+check,fail_count
+port_out_of_0_65535,0
+protocol_out_of_0_255,0
+hour_out_of_0_23,0
+minute_out_of_0_59,0
+second_out_of_0_59,0
