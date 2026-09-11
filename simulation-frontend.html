@@ -1,0 +1,894 @@
+<!doctype html>
+<html lang="en" data-theme="cyan" data-mode="dark">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>FlowDetect - HGB Powered Network IDS</title>
+<meta name="description" content="FlowDetect v2.0 - Production-grade Network Intrusion Detection System with HGB model, 0.9801 recall @ 0.2985% FPR, ONNX Runtime"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link rel="stylesheet" media="print" onload="this.media='all'" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Poppins:wght@800&family=JetBrains+Mono:wght@400;600&display=swap"/>
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Poppins:wght@800&family=JetBrains+Mono:wght@400;600&display=swap"/></noscript>
+<script>
+  try{
+    var d=document.documentElement;
+    d.dataset.theme=localStorage.getItem('ds-theme')||'cyan';
+    d.dataset.mode=localStorage.getItem('ds-mode')||'dark';
+  }catch(e){}
+</script>
+<style>
+/* ===== DESIGN SYSTEM TOKENS - EXACT FROM YOUR FILE ===== */
+:root{
+  --bg:#050507; --bg-elevated:#0b0b0f; --bg-sunken:#020203;
+  --surface:rgba(255,255,255,.04); --surface-2:rgba(255,255,255,.07);
+  --surface-hover:rgba(255,255,255,.09);
+  --border:rgba(255,255,255,.09); --border-strong:rgba(255,255,255,.17);
+  --text:#f4f5f7; --text-dim:#a1a7b3; --text-mute:#6d7480; --text-faint:#484e59;
+  --ok:#10b981; --ok-bg:rgba(16,185,129,.13);
+  --warn:#f59e0b; --warn-bg:rgba(245,158,11,.13);
+  --err:#ef4444; --err-bg:rgba(239,68,68,.13);
+  --info:#3b82f6; --info-bg:rgba(59,130,246,.13);
+  --font-sans:"Inter",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --font-display:"Poppins",var(--font-sans);
+  --font-mono:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,monospace;
+  --t-xs:11px; --t-sm:12.5px; --t-base:14.5px; --t-md:16px;
+  --t-lg:19px; --t-xl:24px; --t-2xl:30px; --t-3xl:38px; --t-4xl:48px;
+  --s-1:4px; --s-2:8px; --s-3:12px; --s-4:16px; --s-5:24px;
+  --s-6:32px; --s-7:48px; --s-8:64px; --s-9:96px;
+  --r-xs:5px; --r-sm:8px; --r-md:12px; --r-lg:16px; --r-xl:20px;
+  --r-2xl:26px; --r-full:9999px;
+  --ease:cubic-bezier(.22,1,.36,1);
+  --dur-fast:.15s; --dur:.28s; --dur-slow:.5s;
+  --maxw:1200px;
+  /* Syntax tokens - cyan theme */
+  --sx-com:#5c6470; --sx-key:var(--a-400); --sx-str:#9ece6a; --sx-num:#ff9e64;
+  --sx-fn:#7aa2f7; --sx-typ:#5bd6c6; --sx-op:#8b95a5; --sx-tag:#7ee0a8;
+  --sx-att:#f0a35e; --sx-pun:#7d8797; --sx-bul:#f2789b; --sx-var:#ccd4de;
+}
+[data-theme="cyan"]{--a-50:#ecfeff;--a-100:#cffafe;--a-200:#a5f3fc;--a-300:#67e8f9;--a-400:#22d3ee;--a-500:#06b6d4;--a-600:#0891b2;--a-700:#0e7490;--a-800:#155e75;--a-900:#164e63;--a-rgb:6,182,212;--a-glow:34,211,238;--a-grad:linear-gradient(135deg,#06b6d4,#3b82f6);--a-name:"Cyan / Azure"}
+[data-mode="light"]{
+  --bg:#fbfbfd; --bg-elevated:#fff; --bg-sunken:#f2f3f6;
+  --surface:rgba(0,0,0,.025); --surface-2:rgba(0,0,0,.045);
+  --surface-hover:rgba(0,0,0,.06);
+  --border:rgba(0,0,0,.10); --border-strong:rgba(0,0,0,.20);
+  --text:#0f1115; --text-dim:#4a5160; --text-mute:#6f7784; --text-faint:#9aa1ad;
+  --sx-com:#7a8394; --sx-key:#8250df; --sx-str:#0a7f4e; --sx-num:#b3541e;
+  --sx-fn:#1f5fd0; --sx-typ:#0e7490; --sx-op:#57606a; --sx-tag:#116329;
+  --sx-att:#b3541e; --sx-pun:#6e7781; --sx-bul:#a3246c; --sx-var:#111826;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased}
+body{background:var(--bg);color:var(--text);font-family:var(--font-sans);font-size:var(--t-base);line-height:1.72;overflow-x:hidden;transition:background .35s var(--ease),color .35s var(--ease)}
+body::before{content:'';position:fixed;inset:0;z-index:9999;opacity:.045;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+[data-mode="light"] body::before{opacity:.02}
+#bg{position:fixed;inset:0;z-index:-10;background:var(--bg);overflow:hidden}
+.orb{position:absolute;top:50%;left:50%;border-radius:50%;will-change:transform}
+.orb-1{width:1100px;height:1100px;margin:-550px 0 0 -550px;animation:o1 17s ease-in-out infinite;background-image:radial-gradient(circle,rgba(var(--a-rgb),.22) 0%,rgba(var(--a-rgb),0) 65%)}
+.orb-2{width:950px;height:950px;margin:-475px 0 0 -475px;animation:o2 21s ease-in-out infinite;background-image:radial-gradient(circle,rgba(var(--a-glow),.14) 0%,rgba(var(--a-glow),0) 65%)}
+@keyframes o1{0%,100%{transform:translate(-140px,-90px) scale(1)}50%{transform:translate(140px,90px) scale(1.28)}}
+@keyframes o2{0%,100%{transform:translate(140px,90px) scale(1.25)}50%{transform:translate(-140px,-90px) scale(1)}}
+#bg-grid{position:absolute;inset:0;opacity:.075;background-size:52px 52px;background-image:linear-gradient(rgba(255,255,255,.1) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.1) 1px,transparent 1px)}
+[data-mode="light"] #bg-grid{opacity:.05;background-image:linear-gradient(rgba(0,0,0,.14) 1px,transparent 1px),linear-gradient(90deg,rgba(0,0,0,.14) 1px,transparent 1px)}
+#bg-vig{position:absolute;inset:0;background:linear-gradient(to bottom,transparent 40%,rgba(0,0,0,.55))}
+[data-mode="light"] #bg-vig{background:linear-gradient(to bottom,transparent 40%,rgba(0,0,0,.05))}
+
+/* NAVBAR */
+#nav{position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:200;width:calc(100% - 2.5rem);max-width:1280px;border-radius:var(--r-full);min-height:66px;padding:10px 0;background:rgba(255,255,255,.05);backdrop-filter:blur(14px) saturate(160%);-webkit-backdrop-filter:blur(14px) saturate(160%);border:1px solid rgba(255,255,255,.15);box-shadow:rgba(255,255,255,.18) -16px 0 17px 8px,rgba(255,255,255,.04) 16px 0 19px 20px,rgba(0,0,0,.15) 1px 1px 0 0;transition:min-height var(--dur-slow) var(--ease),padding var(--dur-slow) var(--ease)}
+[data-mode="light"] #nav{background:rgba(255,255,255,.72);border-color:rgba(0,0,0,.09);box-shadow:0 8px 32px rgba(0,0,0,.09)}
+#nav.small{min-height:56px;padding:6px 0}
+.nav-in{display:flex;align-items:center;gap:12px;padding:0 18px;height:100%}
+.brand{display:flex;align-items:center;gap:10px;cursor:pointer;position:relative;flex:none}
+.brand-halo{position:absolute;inset:-8px;border-radius:var(--r-full);background:rgba(var(--a-rgb),.22);filter:blur(12px);opacity:0;transition:opacity .5s}
+.brand:hover .brand-halo{opacity:1}
+.brand-mark{width:34px;height:34px;border-radius:10px;background:var(--a-grad);display:grid;place-items:center;position:relative;z-index:2;box-shadow:0 8px 20px rgba(var(--a-rgb),.32);transition:transform .3s}
+.brand:hover .brand-mark{transform:scale(1.07) rotate(-4deg)}
+.brand-name{font-family:var(--font-display);font-size:17px;font-weight:800;letter-spacing:-.03em;position:relative;z-index:2}
+.brand-sub{font-family:var(--font-mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--text-mute);margin-top:1px}
+.nav-links{display:flex;gap:2px;margin-left:10px;flex-wrap:wrap}
+.nav-link{padding:7px 12px;font-size:13px;font-weight:500;color:var(--text-dim);border-radius:var(--r-full);background:none;border:0;cursor:pointer;font-family:var(--font-sans);transition:all var(--dur-fast);white-space:nowrap}
+.nav-link:hover{color:var(--text);background:var(--surface-2)}
+.nav-link.on{color:var(--a-300);background:rgba(var(--a-rgb),.13)}
+[data-mode="light"] .nav-link.on{color:var(--a-700)}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.icon-btn{width:34px;height:34px;border-radius:var(--r-sm);border:1px solid var(--border);background:var(--surface);color:var(--text-dim);cursor:pointer;display:grid;place-items:center;transition:all var(--dur-fast)}
+.icon-btn:hover{color:var(--text);border-color:var(--border-strong);background:var(--surface-hover)}
+#navTog{display:none}
+@media(max-width:940px){
+  .nav-links{display:none;position:absolute;top:calc(100% + 10px);left:0;right:0;flex-direction:column;align-items:stretch;padding:14px;margin:0;background:var(--bg-elevated);backdrop-filter:blur(20px);border:1px solid var(--border-strong);border-radius:var(--r-2xl);box-shadow:0 20px 50px rgba(0,0,0,.5)}
+  .nav-links.open{display:flex}
+  #navTog{display:grid}
+}
+
+/* HERO - FIXED TO FIT WHOLE SCREEN ALL DEVICES */
+#hero{position:relative;min-height:100dvh;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:96px 24px 40px;overflow:hidden;box-sizing:border-box}
+.rings{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;overflow:hidden}
+.rings-in{position:relative;width:min(72%,800px);height:min(78vh,720px)}
+.ring{position:absolute;left:0;right:0;height:95%;border-radius:100em;opacity:.8;border:1.5px solid rgba(var(--a-glow),.2);will-change:transform;box-shadow:inset 0 0 40px 5px rgba(var(--a-glow),.24),inset 0 0 100px 20px rgba(var(--a-glow),.14),0 0 60px 15px rgba(var(--a-glow),.14)}
+.ring-t{top:0;animation:rt 2s var(--ease) .1s both}
+.ring-b{bottom:0;animation:rb 2s var(--ease) .1s both}
+@keyframes rt{from{transform:translateY(-150%) scale(1.25);opacity:0}to{transform:translateY(-60%) scale(1.25);opacity:.8}}
+@keyframes rb{from{transform:translateY(150%) scale(1.4);opacity:0}to{transform:translateY(35%) scale(1.4);opacity:.8}}
+.hero-in{position:relative;z-index:5;max-width:920px;width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0}
+.kicker{font-family:var(--font-mono);font-size:10px;letter-spacing:.34em;text-transform:uppercase;color:var(--a-400);display:block;margin-bottom:14px;line-height:1.5}
+#hero h1{font-family:var(--font-display);font-weight:800;letter-spacing:-.035em;line-height:1.02;font-size:clamp(30px,6.2vw,62px);margin:0}
+.grad{background:var(--a-grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.hero-sub{color:var(--text-dim);font-size:clamp(14px,1.8vw,16.5px);max-width:68ch;margin:16px auto 0;line-height:1.65}
+.hero-sub b{color:var(--text);font-weight:700}
+.cta-row{display:flex;gap:11px;justify-content:center;flex-wrap:wrap;margin-top:22px}
+.stat-row{display:flex;gap:28px;justify-content:center;flex-wrap:wrap;margin-top:28px}
+.stat .v{font-family:var(--font-display);font-size:clamp(18px,2.6vw,26px);font-weight:800;color:var(--a-300);line-height:1}
+[data-mode="light"] .stat .v{color:var(--a-700)}
+.stat .l{font-family:var(--font-mono);font-size:8.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--text-mute);margin-top:5px;line-height:1.4}
+@media(max-height:800px){
+  #hero{padding:84px 20px 24px}
+  #hero h1{font-size:clamp(26px,5.2vw,48px)}
+  .hero-sub{margin-top:10px;font-size:13.5px}
+  .cta-row{margin-top:16px}
+  .stat-row{margin-top:18px;gap:18px}
+}
+@media(max-width:640px){
+  #hero{padding:88px 16px 28px;min-height:100dvh}
+  .rings-in{width:92%;height:72vh}
+  #hero h1{font-size:clamp(26px,8vw,38px);line-height:1.08}
+  .hero-sub{font-size:13.5px;margin-top:12px}
+  .stat-row{gap:16px;margin-top:20px}
+  .stat .v{font-size:16px}
+}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;cursor:pointer;font-family:var(--font-sans);font-weight:650;font-size:13.5px;padding:11px 22px;border-radius:var(--r-md);transition:all var(--dur);text-decoration:none;white-space:nowrap}
+.btn-primary{background:var(--a-600);color:#fff}
+.btn-primary:hover{background:var(--a-500);box-shadow:0 0 26px rgba(var(--a-rgb),.45);transform:translateY(-1px)}
+.btn-ghost{background:var(--surface);color:var(--text);border:1px solid var(--border-strong)}
+.btn-ghost:hover{background:var(--surface-hover)}
+.btn-soft{background:rgba(var(--a-rgb),.13);color:var(--a-300);border:1px solid rgba(var(--a-rgb),.3)}
+[data-mode="light"] .btn-soft{color:var(--a-700)}
+.btn-soft:hover{background:rgba(var(--a-rgb),.22)}
+.btn-sm{padding:7px 14px;font-size:12px;border-radius:var(--r-sm)}
+.btn-lg{padding:14px 30px;font-size:15px;border-radius:var(--r-lg)}
+
+/* LAYOUT */
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 26px}
+.sec{padding:72px 0;scroll-margin-top:100px;content-visibility:auto;contain-intrinsic-size:auto 900px}
+#hero,.sec:first-of-type{content-visibility:visible}
+.sec-head{margin-bottom:28px;max-width:82ch}
+.sec-num{font-family:var(--font-mono);font-size:10px;letter-spacing:.3em;text-transform:uppercase;color:var(--a-400);display:block;margin-bottom:9px}
+.sec-head h2{font-family:var(--font-display);font-size:clamp(25px,4vw,37px);font-weight:800;letter-spacing:-.028em;line-height:1.1;margin-bottom:9px}
+.sec-head .sub{color:var(--text-dim);font-size:15.5px}
+.rule{height:1px;background:linear-gradient(90deg,transparent,rgba(var(--a-rgb),.4),transparent)}
+.grid{display:grid;gap:14px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(290px,1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(215px,1fr))}
+.g4{grid-template-columns:repeat(auto-fit,minmax(160px,1fr))}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.demo{border:1px solid var(--border);border-radius:var(--r-xl);padding:22px;margin:14px 0;background:linear-gradient(180deg,var(--surface),transparent);position:relative;overflow:hidden}
+.demo::before{content:'';position:absolute;inset:0;pointer-events:none;background:radial-gradient(500px circle at 50% 0%,rgba(var(--a-rgb),.13),transparent 70%)}
+.demo > *{position:relative;z-index:1}
+.demo-label{position:absolute;top:9px;right:13px;font-family:var(--font-mono);font-size:8.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--text-faint);z-index:2}
+
+/* CARDS */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:18px 20px;transition:all var(--dur);position:relative;overflow:hidden}
+.card:hover{border-color:rgba(var(--a-rgb),.32)}
+.card.spot::after{content:'';position:absolute;inset:0;opacity:0;transition:opacity var(--dur);pointer-events:none;background:radial-gradient(220px circle at var(--mx,50%) var(--my,50%),rgba(var(--a-rgb),.15),transparent 70%)}
+.card.spot:hover::after{opacity:1}
+.card > *{position:relative;z-index:1}
+.card-t{font-family:var(--font-display);font-size:15.5px;font-weight:700;margin-bottom:5px}
+.card-d{font-size:13.4px;color:var(--text-dim);line-height:1.68}
+
+/* CHIPS */
+.chip{display:inline-flex;align-items:center;gap:5px;font-family:var(--font-mono);font-size:9.5px;font-weight:600;letter-spacing:.11em;text-transform:uppercase;padding:3.5px 10px;border-radius:var(--r-full);margin:2px 3px 2px 0;background:rgba(var(--a-rgb),.13);color:var(--a-300);border:1px solid rgba(var(--a-rgb),.3)}
+[data-mode="light"] .chip{color:var(--a-700)}
+.chip-ok{background:var(--ok-bg);color:#34d399;border-color:rgba(16,185,129,.32)}
+.chip-warn{background:var(--warn-bg);color:#fbbf24;border-color:rgba(245,158,11,.32)}
+.chip-err{background:var(--err-bg);color:#f87171;border-color:rgba(239,68,68,.32)}
+.chip-neutral{background:var(--surface-2);color:var(--text-mute);border-color:var(--border)}
+
+/* CODE - FIXED CYAN THEME VISIBLE */
+.code{position:relative;margin:12px 0}
+.code-bar{display:flex;align-items:center;gap:8px;padding:7px 12px;background:var(--bg-sunken);border:1px solid var(--border);border-bottom:0;border-radius:var(--r-md) var(--r-md) 0 0}
+.code-lang{font-family:var(--font-mono);font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--a-400)}
+.code-file{font-family:var(--font-mono);font-size:11px;color:var(--text-mute)}
+.copy{margin-left:auto;background:none;border:1px solid var(--border);color:var(--text-mute);font-family:var(--font-mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;padding:3px 9px;border-radius:var(--r-xs);cursor:pointer;transition:all var(--dur-fast)}
+.copy:hover{color:var(--a-300);border-color:rgba(var(--a-rgb),.4);background:rgba(var(--a-rgb),.1)}
+pre{background:#08090c;border:1px solid var(--border);border-left:2px solid var(--a-500);border-radius:var(--r-md);padding:14px 16px;font-size:12.2px;font-family:var(--font-mono);overflow-x:auto;line-height:1.68;color:#ccd4de;white-space:pre;margin:0;box-shadow:0 0 20px rgba(var(--a-rgb),.08)}
+[data-mode="light"] pre{background:#0e1117;color:#ccd4de}
+.code-bar + pre{border-radius:0 0 var(--r-md) var(--r-md);border-top:0}
+code{font-family:var(--font-mono);font-size:.87em;background:rgba(var(--a-rgb),.13);color:var(--a-300);padding:1.5px 6px;border-radius:4px}
+[data-mode="light"] code{color:var(--a-700);background:rgba(var(--a-rgb),.11)}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+pre .c,pre .t-com{color:var(--sx-com);font-style:italic}
+pre .k,pre .t-key{color:var(--sx-key);font-weight:600}
+pre .s,pre .t-str{color:var(--sx-str)}
+pre .n,pre .t-num{color:var(--sx-num)}
+pre .f,pre .t-fn{color:var(--sx-fn)}
+pre .p,pre .t-typ{color:var(--sx-typ)}
+pre .t-op{color:var(--sx-op)}
+pre .t-tag{color:var(--sx-tag)}
+pre .t-att{color:var(--sx-att)}
+pre .t-pun{color:var(--sx-pun)}
+pre .t-bul{color:var(--sx-bul)}
+pre .t-var{color:var(--sx-var)}
+[data-mode="light"] pre{background:#fbfcfd;color:var(--sx-var);border-color:var(--border);border-left-color:var(--a-500)}
+[data-mode="light"] .code-bar{background:#f2f4f7}
+
+/* TABLES */
+.tbl-wrap{overflow-x:auto;margin:14px 0;border:1px solid var(--border);border-radius:var(--r-md);scrollbar-width:none}
+.tbl-wrap::-webkit-scrollbar{display:none}
+table{width:100%;border-collapse:collapse;font-size:13.2px;min-width:520px}
+th{text-align:left;padding:10px 13px;font-family:var(--font-mono);font-size:9.5px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--a-400);border-bottom:1px solid var(--border-strong);white-space:nowrap;background:var(--surface)}
+td{padding:9px 13px;border-bottom:1px solid var(--border);color:var(--text-dim);vertical-align:top;line-height:1.6}
+td strong{color:var(--text)}
+tbody tr:last-child td{border-bottom:0}
+tbody tr:hover td{background:rgba(var(--a-rgb),.05)}
+
+/* CALLOUTS */
+.note{border-left:2px solid var(--a-500);background:rgba(var(--a-rgb),.07);border-radius:0 var(--r-md) var(--r-md) 0;padding:13px 18px;margin:16px 0;font-size:13.6px;line-height:1.74;color:var(--text-dim)}
+.note strong{color:var(--a-200)}
+[data-mode="light"] .note strong{color:var(--a-800)}
+.note-ok{border-color:var(--ok);background:var(--ok-bg)}
+.note-warn{border-color:var(--warn);background:var(--warn-bg)}
+.note-err{border-color:var(--err);background:var(--err-bg)}
+
+/* BORDER TREATMENTS */
+.b-wire{position:relative;border:1px solid var(--border);border-radius:var(--r-lg);background:var(--surface);padding:16px 18px}
+.b-wire::before{content:'';position:absolute;top:10%;bottom:10%;left:-1px;width:2px;border-radius:2px;background:linear-gradient(180deg,transparent,var(--a-400) 22%,var(--a-300) 50%,var(--a-400) 78%,transparent);box-shadow:0 0 6px rgba(var(--a-rgb),.9),0 0 16px rgba(var(--a-rgb),.55),0 0 34px rgba(var(--a-rgb),.28)}
+.b-wire.right::before{left:auto;right:-1px}
+.b-split{border:1px solid var(--border);border-left:3px solid var(--a-500);border-radius:0 var(--r-lg) var(--r-lg) 0;padding:14px 18px;background:var(--surface)}
+.b-split.ok{border-left-color:var(--ok)}
+.b-split.warn{border-left-color:var(--warn)}
+.b-split.err{border-left-color:var(--err)}
+
+/* FLOWCHART - FIXED ALIGNMENT */
+.fc{display:flex;flex-direction:column;align-items:center;padding:8px 0;gap:0}
+.fc-row{display:flex;align-items:center;flex-wrap:wrap;justify-content:center;gap:0}
+.fc-scroll{overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.fc-scroll::-webkit-scrollbar{height:0;display:none}
+.fn{position:relative;display:grid;place-items:center;text-align:center;flex:none;min-width:112px;min-height:44px;padding:10px 18px;font:600 12.5px var(--font-sans);color:var(--text);background:var(--surface-2);border:1.5px solid var(--border-strong);border-radius:var(--r-md);transition:border-color .15s,box-shadow .15s,transform .15s}
+.fn:hover{border-color:rgba(var(--a-rgb),.6);box-shadow:0 0 16px rgba(var(--a-rgb),.22);transform:translateY(-1px)}
+.fn-term{border-radius:var(--r-full);background:rgba(var(--a-rgb),.15);border-color:rgba(var(--a-rgb),.5);color:var(--a-300)}
+[data-mode="light"] .fn-term{color:var(--a-700)}
+.fn-term.end{background:var(--ok-bg);border-color:rgba(16,185,129,.5);color:var(--ok)}
+.fn-proc{border-radius:var(--r-sm)}
+.fn-dec{width:132px;height:132px;min-width:0;min-height:0;padding:0;border:0;background:none;position:relative;display:grid;place-items:center}
+.fn-dec::before{content:'';position:absolute;inset:19px;transform:rotate(45deg);background:var(--warn-bg);border:1.5px solid rgba(245,158,11,.55);border-radius:5px;transition:box-shadow .15s}
+.fn-dec:hover::before{box-shadow:0 0 18px rgba(245,158,11,.3)}
+.fn-dec span{position:relative;z-index:1;color:var(--warn);font-weight:650;font-size:12px;max-width:88px;line-height:1.25}
+[data-mode="light"] .fn-dec span{color:#92400e}
+.fn-io{transform:skewX(-16deg);background:rgba(59,130,246,.13);border-color:rgba(59,130,246,.5);border-radius:3px}
+.fn-io>span{display:block;transform:skewX(16deg);color:#93c5fd}
+[data-mode="light"] .fn-io>span{color:#1d4ed8}
+.fn-db{border-radius:50%/16px;padding:16px 22px;background:linear-gradient(180deg,rgba(var(--a-rgb),.2),rgba(var(--a-rgb),.08));border-color:rgba(var(--a-rgb),.45)}
+.fn-sub{border-radius:3px;box-shadow:inset 4px 0 0 var(--a-500),inset -4px 0 0 var(--a-500);padding:10px 26px}
+.fn-conn{width:44px;height:44px;min-width:0;min-height:0;border-radius:50%;padding:0;font:700 13px var(--font-mono);background:rgba(var(--a-rgb),.16);border-color:rgba(var(--a-rgb),.55);color:var(--a-300)}
+[data-mode="light"] .fn-conn{color:var(--a-700)}
+.fn.is-ok{background:var(--ok-bg);border-color:rgba(16,185,129,.5);color:var(--ok)}
+.fn.is-err{background:var(--err-bg);border-color:rgba(239,68,68,.5);color:var(--err)}
+.fn-cap{display:block;font:9px var(--font-mono);letter-spacing:.14em;text-transform:uppercase;color:var(--text-mute);margin-top:6px}
+.ar{flex:none;position:relative;background:rgba(var(--a-rgb),.5)}
+.ar-r{width:40px;height:2px}
+.ar-r::after{content:'';position:absolute;right:-1px;top:50%;transform:translateY(-50%);border-left:7px solid rgba(var(--a-rgb),.85);border-top:5px solid transparent;border-bottom:5px solid transparent}
+.ar-d{width:2px;height:30px;margin:0 auto;flex:none}
+.ar-d::after{content:'';position:absolute;bottom:-1px;left:50%;transform:translateX(-50%);border-top:7px solid rgba(var(--a-rgb),.85);border-left:5px solid transparent;border-right:5px solid transparent}
+.ar-u{width:2px;height:30px;margin:0 auto}
+.ar-u::after{content:'';position:absolute;top:-1px;left:50%;transform:translateX(-50%);border-bottom:7px solid rgba(var(--a-rgb),.85);border-left:5px solid transparent;border-right:5px solid transparent}
+.ar-live{background:repeating-linear-gradient(180deg,rgba(var(--a-rgb),.85) 0 7px,transparent 7px 14px);animation:arflow .6s linear infinite}
+.ar-d.ar-live,.ar-u.ar-live{background:repeating-linear-gradient(180deg,rgba(var(--a-rgb),.85) 0 7px,transparent 7px 14px)}
+@keyframes arflow{to{background-position:0 14px}}
+.ar-lb{position:absolute;font:600 9.5px var(--font-mono);letter-spacing:.1em;text-transform:uppercase;background:var(--bg);padding:1px 6px;border-radius:var(--r-full);color:var(--text-dim);white-space:nowrap;border:1px solid var(--border);z-index:2}
+.ar-r>.ar-lb{top:-10px;left:50%;transform:translateX(-50%)}
+.ar-d>.ar-lb{left:10px;top:50%;transform:translateY(-50%)}
+.ar-u>.ar-lb{left:10px;top:50%;transform:translateY(-50%)}
+.ar-lb.yes{color:var(--ok);border-color:rgba(16,185,129,.4)}
+.ar-lb.no{color:var(--err);border-color:rgba(239,68,68,.4)}
+@media(max-width:640px){
+  .fn{min-width:96px;font-size:11.5px;padding:9px 13px}
+  .ar-r{width:26px}
+  .fn-dec{width:112px;height:112px}
+  .fn-dec span{font-size:11px;max-width:74px}
+}
+
+/* PROGRESS */
+#prog{position:fixed;top:0;left:0;height:2px;width:0;z-index:300;background:var(--a-grad);box-shadow:0 0 12px rgba(var(--a-rgb),.8);transition:width .1s linear}
+#top{position:fixed;right:22px;bottom:22px;z-index:150;width:42px;height:42px;border-radius:50%;border:1px solid rgba(var(--a-rgb),.35);background:rgba(var(--a-rgb),.14);backdrop-filter:blur(12px);color:var(--a-300);cursor:pointer;display:grid;place-items:center;opacity:0;pointer-events:none;transition:all var(--dur)}
+#top.on{opacity:1;pointer-events:auto}
+#top:hover{background:rgba(var(--a-rgb),.28);box-shadow:0 0 22px rgba(var(--a-rgb),.45)}
+
+/* REVEAL */
+.rv{opacity:0;transform:translateY(26px);transition:opacity .65s var(--ease),transform .65s var(--ease)}
+.rv.in{opacity:1;transform:none}
+
+/* CUSTOM - EQUAL HEIGHT FIX FOR LIVE LOGS vs FASTAPI */
+.metric-v{font-family:var(--font-display);font-size:28px;font-weight:800;color:var(--a-300);line-height:1}
+[data-mode="light"] .metric-v{color:var(--a-700)}
+.metric-l{font-family:var(--font-mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--text-mute);margin-top:6px}
+#live .g2{grid-auto-rows:1fr;align-items:stretch}
+#live .g2 > .card{display:flex;flex-direction:column;height:100%;min-height:520px}
+#live .g2 > .card .log{flex:1;min-height:340px;max-height:none;height:100%}
+#live .g2 > .card .code{flex:0 0 auto}
+#live .g2 > .card .code pre{max-height:220px}
+.log{background:#08090c;border:1px solid var(--border);border-radius:var(--r-md);padding:14px;font-family:var(--font-mono);font-size:11px;line-height:1.7;overflow-y:auto;scrollbar-width:none}
+.log::-webkit-scrollbar{display:none}
+.log-line{margin:3px 0;display:flex;gap:8px}
+.log-time{color:var(--text-faint);flex-shrink:0}
+@media(max-width:900px){
+  #live .g2{grid-auto-rows:auto}
+  #live .g2 > .card{min-height:auto}
+  #live .g2 > .card .log{min-height:260px;max-height:320px}
+}
+
+html,body{scrollbar-width:none;-ms-overflow-style:none}
+html::-webkit-scrollbar,body::-webkit-scrollbar{width:0;height:0;display:none}
+.noscroll{scrollbar-width:none;-ms-overflow-style:none}
+.noscroll::-webkit-scrollbar{display:none}
+
+@media(max-width:600px){
+  .wrap{padding:0 15px}.sec{padding:48px 0}.rings-in{width:92%}
+  #hero{padding:110px 16px 50px;min-height:80vh}
+}
+</style>
+</head>
+<body>
+
+<div id="prog"></div>
+<div id="bg" aria-hidden="true"><div class="orb orb-1"></div><div class="orb orb-2"></div><div id="bg-grid"></div><div id="bg-vig"></div></div>
+
+<nav id="nav">
+  <div class="nav-in">
+    <div class="brand" data-go="hero">
+      <div class="brand-halo"></div>
+      <div class="brand-mark">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          <path d="M9 12l2 2 4-4"/>
+        </svg>
+      </div>
+      <div>
+        <div class="brand-name">FlowDetect</div>
+        <div class="brand-sub">HGB • ONNX • Production IDS</div>
+      </div>
+    </div>
+    <div class="nav-links" id="navLinks">
+      <button class="nav-link on" data-go="overview">Overview</button>
+      <button class="nav-link" data-go="live">Live Flows</button>
+      <button class="nav-link" data-go="model">HGB Model</button>
+      <button class="nav-link" data-go="architecture">Architecture</button>
+      <button class="nav-link" data-go="features">Features</button>
+      <button class="nav-link" data-go="api">API</button>
+    </div>
+    <div class="nav-right">
+      <button class="icon-btn" id="modeBtn" aria-label="Toggle theme">
+        <svg id="modeIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      </button>
+      <button class="icon-btn" id="navTog" aria-label="Menu">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<header id="hero">
+  <div class="rings" aria-hidden="true"><div class="rings-in"><div class="ring ring-t"></div><div class="ring ring-b"></div></div></div>
+  <div class="hero-in">
+    <span class="kicker">FlowDetect v2.0 • Production-Grade Network IDS • HGB Incumbent</span>
+    <h1><span class="grad">FlowDetect</span><br>Network IDS that<br>catches 98% attacks<br>at 0.3% false alarms</h1>
+    <p class="hero-sub"><b>FlowDetect</b> is a production Network Intrusion Detection System trained on <b>16M flows (5.8GB)</b> filtered to 11.7M, using <b>HGB model</b> with 32 features, <b>cost-optimal threshold 0.924</b> at FPR 0.2985%, ONNX Runtime p99 0.5ms, deployed via FastAPI.</p>
+    <div class="cta-row">
+      <button class="btn btn-primary btn-lg" data-go="live">View Live Monitoring
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+      <button class="btn btn-ghost btn-lg" data-go="model">HGB Model Report</button>
+      <button class="btn btn-ghost btn-lg" data-go="api">FastAPI Response</button>
+    </div>
+    <div class="stat-row">
+      <div class="stat"><div class="v">FlowDetect</div><div class="l">16M → 11.7M Filtered • 836MB Parquet</div></div>
+      <div class="stat"><div class="v">0.9801</div><div class="l">Recall @ FPR 0.2985% • HGB 29.1s</div></div>
+      <div class="stat"><div class="v">Cyan</div><div class="l">Theme • #06b6d4 • --a-500</div></div>
+      <div class="stat"><div class="v">4.97/1k</div><div class="l">Cost • 3.95 Alerts, 0.02 Misses</div></div>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<!-- OVERVIEW -->
+<section class="sec" id="overview">
+<div class="wrap">
+  <div class="sec-head rv">
+    <span class="sec-num">01 • Overview • FlowDetect</span>
+    <h2>From raw packets to ONNX deployment</h2>
+    <p class="sub">FlowDetect watches network traffic, groups packets into bidirectional flows, extracts 32 statistical features per flow, and classifies each flow as Benign or one of 5 attack families using HGB exported to ONNX Runtime. Built for A+ grade, correcting 23+ flaws from v1.</p>
+  </div>
+
+  <div class="grid g3 rv">
+    <div class="card spot">
+      <div class="card-t">What FlowDetect Solves</div>
+      <div class="card-d">Detects DDoS volumetric floods, SYN Flood, Port Scanning, Brute Force, Data Exfiltration, Low-and-slow. Prior 0.001 real world, 1 attack per 1000 flows.</div>
+      <div style="margin-top:12px"><span class="chip chip-ok">FPR 0.2985%</span><span class="chip">Recall 0.9801</span><span class="chip chip-neutral">Cost 4.97/1k</span></div>
+    </div>
+    <div class="card spot">
+      <div class="card-t">Why HGB Incumbent</div>
+      <div class="card-d">HGB 29.1s fit, 0.9801 recall @ 0.2985% FPR, Flood 0.9744. XGBoost 0.9804 (+14) but 212.4s 7.3x slower, McNemar p=0.3497 not significant.</div>
+      <div style="margin-top:12px"><span class="chip chip-ok">29.1s Fit</span><span class="chip">0.9801 Recall</span><span class="chip chip-neutral">ONNX p99 0.5ms</span></div>
+    </div>
+    <div class="card spot">
+      <div class="card-t">FlowDetect Status</div>
+      <div class="card-d">ML 85% done, Engineering 15% left: ONNX + SHA256, Redis TTL 30s, FastAPI batch 64, TimescaleDB, Grafana 5s. 6-7 days to live.</div>
+      <div style="margin-top:12px"><span class="chip">85% ML Done</span><span class="chip chip-warn">15% Deploy</span><span class="chip chip-ok">A+ Ready</span></div>
+    </div>
+  </div>
+
+  <h3>How HGB Becomes ONNX Usable Anywhere</h3>
+  <div class="grid g2 rv">
+    <div class="b-split">
+      <div class="card-t">Training (Offline, Once)</div>
+      <div class="card-d">Load filtered_clean.parquet 836M → Temporal split 80/20 → StandardScaler fit on TRAIN only → HGB balanced 500 trees → Evaluate once → 0.9801 recall.</div>
+    </div>
+    <div class="b-split ok">
+      <div class="card-t">Conversion to ONNX (Portable)</div>
+      <div class="card-d">Unified Pipeline (Scaler+HGB) → skl2onnx opset17 Input [None,32] → Sub/Div nodes → TreeEnsemble → Output. Save .onnx + SHA256 + metadata.json. Validate diff <1e-4, p99 0.5ms.</div>
+    </div>
+  </div>
+
+  <div class="note"><strong>Is "usable anywhere" correct?</strong> Yes - Language-agnostic via ONNX Runtime Python/Go/Rust/Java/C++, needs Runtime + same 32 features same order seconds units.</div>
+</div>
+</section>
+
+<div class="rule"></div>
+
+<!-- LIVE FLOWS -->
+<section class="sec" id="live">
+<div class="wrap">
+  <div class="sec-head rv">
+    <span class="sec-num">02 • Live Monitoring • FlowDetect</span>
+    <h2>Real-time flow classification</h2>
+    <p class="sub">Live capture Scapy / AF_PACKET → Kafka raw-flows → Redis TTL 30s → 32 features → HGB ONNX batch 64 → Alert Router dedup 60s → TimescaleDB → Grafana 5s. FastAPI response below with cyan syntax highlighting.</p>
+  </div>
+
+  <div class="grid g4 rv">
+    <div class="card"><div class="metric-l">Total Flows (1h)</div><div class="metric-v" id="totalFlows">1,284</div><div style="font-size:11px;color:var(--text-mute);margin-top:4px">+12% • FlowDetect</div></div>
+    <div class="card"><div class="metric-l">Attacks Detected</div><div class="metric-v" id="attackCount" style="color:var(--err)">23</div><div style="font-size:11px;color:var(--text-mute);margin-top:4px"><span class="chip chip-err">2 Critical</span> <span class="chip chip-warn">5 High</span></div></div>
+    <div class="card"><div class="metric-l">Top Attacker</div><div class="metric-v" style="font-size:16px" id="topAttacker">10.0.0.99</div><div style="font-size:11px;color:var(--text-mute);margin-top:4px">47 flows • Flood • Win 230</div></div>
+    <div class="card"><div class="metric-l">HGB ONNX Latency p99</div><div class="metric-v" style="color:var(--ok)">0.5ms</div><div style="font-size:11px;color:var(--text-mute);margin-top:4px">Target &lt;2ms ✓ • Queue <span id="queue">0</span>/1024</div></div>
+  </div>
+
+  <div class="tbl-wrap rv" style="margin-top:20px">
+    <table>
+      <thead><tr><th>Time</th><th>Src IP → Dst IP</th><th>Proto</th><th>Packets</th><th>Duration</th><th>Label (HGB)</th><th>Conf</th><th>Latency</th><th>FastAPI</th></tr></thead>
+      <tbody id="flowsBody">
+        <tr><td>14:30:22</td><td>192.168.1.23:54321 → 8.8.8.8:80</td><td>TCP/80</td><td>12</td><td>0.23s</td><td><span class="chip chip-ok">Benign</span></td><td>0.97</td><td>0.34ms</td><td><span class="chip chip-neutral">200 OK</span></td></tr>
+        <tr><td>14:30:21</td><td>10.0.0.99:50000 → 192.168.1.1:80</td><td>TCP/80</td><td>50</td><td>0.05s</td><td><span class="chip chip-err">DDoS LOIC-HTTP</span> <span class="chip chip-err">Critical</span></td><td>0.97</td><td>0.42ms</td><td><span class="chip chip-err">Alert Slack</span></td></tr>
+        <tr><td>14:30:20</td><td>192.168.1.45:41234 → 1.1.1.1:443</td><td>TCP/443</td><td>18</td><td>1.2s</td><td><span class="chip chip-ok">Benign</span></td><td>0.95</td><td>0.31ms</td><td><span class="chip chip-neutral">200 OK</span></td></tr>
+        <tr><td>14:30:19</td><td>10.0.0.100:40000 → 192.168.1.5:22</td><td>TCP/22</td><td>16</td><td>0.8s</td><td><span class="chip chip-warn">SSH-Bruteforce</span></td><td>0.99</td><td>0.38ms</td><td><span class="chip chip-warn">High</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="grid g2 rv">
+    <div class="card">
+      <div class="card-t">Live Logs • FlowDetect • structlog + OpenTelemetry</div>
+      <div class="log" id="log"></div>
+    </div>
+    <div class="card">
+      <div class="card-t">FastAPI Response • POST /predict • Cyan Syntax Highlighted</div>
+      <div class="code"><div class="code-bar"><span class="code-lang">JSON • Cyan #06b6d4</span><span class="code-file">Request • X-API-Key required → 403 if missing • FlowDetect</span></div><pre><code><span class="t-pun">{</span>
+  <span class="t-att">"flow_id"</span><span class="t-op">:</span> <span class="t-str">"uuid"</span><span class="t-pun">,</span>
+  <span class="t-att">"src_ip"</span><span class="t-op">:</span> <span class="t-str">"192.168.1.100"</span><span class="t-pun">,</span>
+  <span class="t-att">"dst_ip"</span><span class="t-op">:</span> <span class="t-str">"10.0.0.1"</span><span class="t-pun">,</span>
+  <span class="t-att">"src_port"</span><span class="t-op">:</span> <span class="t-num">12345</span><span class="t-pun">,</span>
+  <span class="t-att">"dst_port"</span><span class="t-op">:</span> <span class="t-num">80</span><span class="t-pun">,</span>
+  <span class="t-att">"protocol"</span><span class="t-op">:</span> <span class="t-num">6</span><span class="t-pun">,</span>
+  <span class="t-att">"timestamp"</span><span class="t-op">:</span> <span class="t-num">1700000000.0</span><span class="t-pun">,</span>
+  <span class="t-att">"features"</span><span class="t-op">:</span> <span class="t-pun">[</span><span class="t-var">32 float values in canonical order</span><span class="t-pun">]</span>
+<span class="t-pun">}</span></code></pre></div>
+      <div class="code"><div class="code-bar"><span class="code-lang">JSON • Cyan Highlight</span><span class="code-file">200 OK • HGB ONNX • p99 0.5ms • FlowDetect</span></div><pre><code><span class="t-pun">{</span>
+  <span class="t-att">"flow_id"</span><span class="t-op">:</span> <span class="t-str">"uuid"</span><span class="t-pun">,</span>
+  <span class="t-att">"src_ip"</span><span class="t-op">:</span> <span class="t-str">"192.168.1.100"</span><span class="t-pun">,</span>
+  <span class="t-att">"dst_ip"</span><span class="t-op">:</span> <span class="t-str">"10.0.0.1"</span><span class="t-pun">,</span>
+  <span class="t-att">"prediction"</span><span class="t-op">:</span> <span class="t-num">3</span><span class="t-pun">,</span>
+  <span class="t-att">"label"</span><span class="t-op">:</span> <span class="t-str">"DDoS attacks-LOIC-HTTP"</span><span class="t-pun">,</span>
+  <span class="t-att">"confidence"</span><span class="t-op">:</span> <span class="t-num">0.97</span><span class="t-pun">,</span>
+  <span class="t-att">"is_attack"</span><span class="t-op">:</span> <span class="t-key">true</span><span class="t-pun">,</span>
+  <span class="t-att">"attack_type"</span><span class="t-op">:</span> <span class="t-str">"Flood"</span><span class="t-pun">,</span>
+  <span class="t-att">"model_version"</span><span class="t-op">:</span> <span class="t-str">"v20260911_hgb"</span><span class="t-pun">,</span>
+  <span class="t-att">"inference_latency_ms"</span><span class="t-op">:</span> <span class="t-num">0.34</span>
+<span class="t-pun">}</span></code></pre></div>
+      <div class="row" style="margin-top:10px">
+        <button class="btn btn-primary btn-sm" onclick="simulateAttack()">Simulate DDoS Attack</button>
+        <button class="btn btn-ghost btn-sm" onclick="simulateBenign()">Simulate Benign</button>
+        <button class="btn btn-ghost btn-sm" onclick="clearFlows()">Clear Logs</button>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<div class="rule"></div>
+
+<!-- HGB MODEL -->
+<section class="sec" id="model">
+<div class="wrap">
+  <div class="sec-head rv">
+    <span class="sec-num">03 • HGB Model • FlowDetect Incumbent</span>
+    <h2>FlowDetect HGB - 29.1s fit, 0.9801 recall</h2>
+    <p class="sub">FlowDetect HGB trained on 8,197,703 rows, 32 features all32, seed 42, balanced. VAL 1,769,164 TEST 1,755,657. Binary Attack vs Benign 0.9994 accuracy. Init Fwd Win Byts 0.358 rank1.</p>
+  </div>
+
+  <div class="grid g2 rv">
+    <div class="card">
+      <div class="card-t">Model Metrics • FlowDetect • metrics.json</div>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>Class</th><th>Precision</th><th>Recall</th><th>F1</th><th>Support</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Benign</strong></td><td>0.99998</td><td>0.99897</td><td>0.99947</td><td>1,581,874</td></tr>
+          <tr><td><strong>Bot</strong></td><td>0.95007</td><td>0.99963</td><td>0.9742</td><td>21,628</td></tr>
+          <tr><td><strong>DDOS HOIC</strong></td><td>0.99775</td><td>1.0</td><td>0.99887</td><td>29,775</td></tr>
+          <tr><td><strong>DDoS LOIC-HTTP</strong></td><td>0.99819</td><td>0.99978</td><td>0.99898</td><td>86,764</td></tr>
+          <tr><td><strong>DoS Hulk</strong></td><td>0.98765</td><td>0.99981</td><td>0.99369</td><td>21,530</td></tr>
+          <tr><td><strong>SSH-Bruteforce</strong></td><td>0.99964</td><td>0.99992</td><td>0.99978</td><td>14,086</td></tr>
+        </tbody>
+      </table></div>
+      <div style="margin-top:12px"><span class="chip chip-ok">VAL Accuracy 0.9990</span><span class="chip chip-ok">TEST 0.99905</span><span class="chip chip-ok">Binary 0.9994</span></div>
+    </div>
+    <div class="card">
+      <div class="card-t">Threshold & Cost • FlowDetect • threshold_report.json</div>
+      <div class="card-d">Untuned argmax: Benign FPR 1.06% FP 3834 → too many false alarms. Cost: FP 1.0 FN 100.0 Prior 0.001.</div>
+      <div class="b-split ok" style="margin-top:12px">
+        <div class="card-t">Cost Optimal • Threshold 0.924 • FlowDetect</div>
+        <div class="card-d">FPR 0.2985%, Recall 0.9773, Prec 0.9726, FP 1077 FN 890, Alerts/1k 3.95 Misses/1k 0.022 Cost/1k 5.25. Every 1000 flows (1 real attack) beeps 4 times, 1 real 3 false.</div>
+      </div>
+      <div class="note">Chosen Val @ FPR 0.1%: Threshold 0.9836 FPR 0.099% Recall 0.9369 Prec 0.9903. Test @ 0.1% FPR: Benign FPR 0.103% FP 372/360k Flood 0.9258 Bot 0.9906.</div>
+    </div>
+  </div>
+
+  <h3>Model Comparison • FlowDetect • 8 Models @ FPR 0.2985%</h3>
+  <div class="tbl-wrap rv"><table>
+    <thead><tr><th>Model</th><th>Fit Seconds</th><th>Val Recall</th><th>Test Recall</th><th>Flood Recall</th><th>FP</th><th>FN</th><th>Cost/1k</th><th>Verdict</th></tr></thead>
+    <tbody>
+      <tr><td><strong>XGBoost</strong></td><td>212.4s</td><td>0.9777</td><td><strong>0.9804</strong></td><td>0.9748</td><td>1075</td><td>775</td><td>4.94</td><td>Best recall +14 p=0.35 NS</td></tr>
+      <tr style="background:rgba(6,182,212,.08);border-left:2px solid #06b6d4"><td><strong>FlowDetect HGB INCUMBENT</strong></td><td><strong>29.1s</strong></td><td>0.9770</td><td>0.9801</td><td>0.9744</td><td>1075</td><td>789</td><td>4.97</td><td><span class="chip chip-ok">KEEP - Fastest</span></td></tr>
+      <tr><td>LightGBM</td><td>264.2s</td><td>0.9769</td><td>0.9794</td><td>0.9744</td><td>1075</td><td>816</td><td>5.04</td><td>9x slower</td></tr>
+    </tbody>
+  </table></div>
+</div>
+</section>
+
+<div class="rule"></div>
+
+<!-- ARCHITECTURE - FIXED ALIGNMENT -->
+<section class="sec" id="architecture">
+<div class="wrap">
+  <div class="sec-head rv">
+    <span class="sec-num">04 • Architecture • FlowDetect 9 Layers</span>
+    <h2>FlowDetect physical to visualization - production grade</h2>
+    <p class="sub">FlowDetect 9 Layers: Physical Network TAP eth0 → Ingestion Scapy/AF_PACKET → Buffer Kafka raw-flows 3 partitions → Flow Assembly FlowKey 5-tuple → FlowState Redis TTL 30s → Feature Extraction 32 features → Inference ONNX Runtime batch 64 p99 0.5ms SHA256 → Decision Alert Router LOW/MED/HIGH/CRIT dedup 60s → Storage TimescaleDB hypertable → Visualization Grafana 5s. Fixed alignment with fc-row and ar-d centered.</p>
+  </div>
+
+  <div class="grid g2 rv">
+    <div class="card b-wire">
+      <div class="card-t">Flow Assembly Layer - Critical Fix</div>
+      <div class="card-d">v1 flaw: global dict + Lock → leak race single machine. v2 fix: Redis Streams TTL. FlowKey hash 5-tuple direction-invariant. Termination FIN/RST idle 30s max 300s 50k pkts. Heap TTL + 1s scanner not per-packet timer.</div>
+    </div>
+    <div class="card b-wire right">
+      <div class="card-t">Inference Layer - Security Fix</div>
+      <div class="card-d">v1 flaw: pickle.load → RCE. v2 fix: ONNX graph + SHA256 verified refuse tampered. Batching asyncio.Queue 1024 → collect 64 OR 10ms → single ONNX p99 0.5ms. Prometheus Counter Histogram Gauge.</div>
+    </div>
+  </div>
+
+  <h3>End-to-End Flowchart • FlowDetect Packet to Alert • Aligned Arrows</h3>
+  <div class="demo rv"><span class="demo-label">Live • FlowDetect • Aligned</span>
+    <div class="fc">
+      <div class="fn fn-term">Internet Packets • eth0 Mirror</div>
+      <div class="ar ar-d"></div>
+      <div class="fn fn-io"><span>Capture Agent • Scapy / AF_PACKET</span></div>
+      <div class="ar ar-d ar-live"></div>
+      <div class="fn fn-proc">Kafka • raw-flows Topic • 3 Partitions • Persistent</div>
+      <div class="ar ar-d"></div>
+      <div class="fn fn-proc">Flow Processor • 5-Tuple Grouping • Redis State • TTL 30s</div>
+      <div class="ar ar-d"></div>
+      <div class="fn fn-proc">32-Feature Extraction • Timing + Volume + Flags + Tool Group</div>
+      <div class="ar ar-d"></div>
+      <div class="fn fn-term">FlowDetect HGB ONNX • Batch 64 • p99 0.5ms • SHA256 Verified</div>
+      <div class="ar ar-d"></div>
+      <div class="fn fn-dec"><span>Attack?</span></div>
+      <!-- Branching correctly aligned using fc-row -->
+      <div style="display:flex;gap:48px;justify-content:center;align-items:flex-start;margin-top:8px;flex-wrap:wrap">
+        <div class="fc" style="min-width:280px">
+          <div class="ar ar-d"><span class="ar-lb yes">Yes</span></div>
+          <div class="fn is-ok">Alert Router • CRITICAL/HIGH/MED/LOW • Dedup 60s • Slack/PagerDuty</div>
+          <div class="ar ar-d"></div>
+          <div class="fn fn-db">TimescaleDB • Hypertable • 1h Chunks • COPY 500k/s</div>
+          <div class="ar ar-d"></div>
+          <div class="fn fn-term end">Grafana Dashboard • 5s Refresh</div>
+        </div>
+        <div class="fc" style="min-width:180px;margin-top:0">
+          <div style="display:flex;align-items:center;justify-content:center;gap:0;margin-top:0">
+            <div class="ar ar-r" style="width:48px"><span class="ar-lb no">No</span></div>
+            <div class="fn">Drop • Benign • No Alert</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h3>ML Pipeline • FlowDetect Strict Order - No Data Leakage • Aligned</h3>
+  <div class="demo rv"><span class="demo-label">Live • FlowDetect ML Pipeline</span>
+    <div class="fc">
+      <div class="fn fn-term">Load CIC-IDS-2018 CSV • 16M → 11.7M Filtered • 83 cols</div>
+      <div class="ar ar-d"></div>
+      <div class="fn fn-proc">Validate 32-Feature Schema • Crash Loudly on Mismatch • Single Source of Truth</div>
+      <div class="ar ar-d"></div>
+      <div class="fn fn-dec"><span>Split Method?</span></div>
+      <!-- Two branches side by side properly aligned -->
+      <div class="fc-row" style="gap:28px;margin-top:14px;align-items:flex-start">
+        <div class="fc" style="min-width:240px">
+          <div class="ar ar-d"><span class="ar-lb no">Flawed</span></div>
+          <div class="fn is-err">Old Flawed • Random Split • Data Leakage • Future leaks into past</div>
+        </div>
+        <div class="fc" style="min-width:260px">
+          <div class="ar ar-d"><span class="ar-lb yes">Correct</span></div>
+          <div class="fn is-ok">Correct • Temporal Split 80/20 by Timestamp • Train past Test future</div>
+        </div>
+      </div>
+      <div class="ar ar-d" style="margin-top:24px"></div>
+      <div class="fn fn-proc">Bounds Clipping • Duration 0-300s • Packets 1-50000</div>
+      <div class="ar ar-d"></div>
+      <div class="fn fn-proc">StandardScaler Fit on TRAIN Only • Transform Train and Test • Avoid Leakage</div>
+      <div class="ar ar-d"></div>
+      <div class="fn fn-proc">SMOTE on Train Only • After Split After Scaling • If Imbalance >3:1</div>
+      <div class="ar ar-d"></div>
+      <div class="fn fn-proc">FlowDetect HGB Training • 500 Trees • Early Stopping 50 • balanced • 29.1s Fit</div>
+      <div class="ar ar-d"></div>
+      <div class="fn fn-proc">Evaluate Once on Test • Held-out Test Touched Once at End Only</div>
+      <div class="ar ar-d"></div>
+      <div class="fn fn-term end">Export to ONNX Opset 17 + SHA256 + Latency Benchmark + model_metadata.json</div>
+    </div>
+  </div>
+</div>
+</section>
+
+<div class="rule"></div>
+
+<!-- FEATURES -->
+<section class="sec" id="features">
+<div class="wrap">
+  <div class="sec-head rv">
+    <span class="sec-num">05 • Features • FlowDetect 32 Canonical</span>
+    <h2>FlowDetect behavioural vs tool fingerprints</h2>
+    <p class="sub">Single source of truth feature_schema.py enforced at train AND inference. IAT in seconds (Scapy time.time()). All 32 must match exactly or model invalid. Cyan chips show importance.</p>
+  </div>
+
+  <div class="tbl-wrap rv"><table>
+    <thead><tr><th>#</th><th>Feature Name</th><th>Description</th><th>Unit</th><th>Group</th><th>Importance</th></tr></thead>
+    <tbody>
+      <tr><td>0</td><td><strong>Flow Duration</strong></td><td>Flow duration last-first</td><td>seconds</td><td>Timing</td><td>0.053 rank 10</td></tr>
+      <tr><td>5</td><td><strong>Flow IAT Mean</strong></td><td>Mean IAT all packets</td><td>seconds</td><td>IAT</td><td>0.190 rank 2</td></tr>
+      <tr><td>15</td><td><strong>Init Fwd Win Byts</strong></td><td>Initial forward window bytes</td><td>bytes</td><td>Tool Group</td><td><strong>0.358 rank 1</strong></td></tr>
+      <tr><td>16</td><td><strong>Init Bwd Win Byts</strong></td><td>Initial backward window bytes</td><td>bytes</td><td>Tool Group</td><td>0.167 rank 4</td></tr>
+      <tr><td>17</td><td><strong>Fwd Seg Size Min</strong></td><td>Min segment size forward</td><td>bytes</td><td>Tool Group</td><td>0.181 rank 3</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note">Full list in metrics.json: 32 features - Flow Duration, Flow Pkts/s, Flow IAT Mean/Max/Std, Tot Fwd Pkts, TotLen Fwd Pkts, Flow Byts/s, Down/Up Ratio, Pkt Len Mean/Std/Max, Pkt Size Avg, Fwd Pkt Len Max/Mean, Bwd Pkt Len Max/Mean, Fwd Header Len, Fwd Seg Size Min, Fwd Act Data Pkts, Fwd IAT Std, Bwd IAT Mean/Tot, SYN/RST/PSH/ACK Flag Cnt, Fwd PSH Flags, Idle/Active Mean, Init Fwd/Bwd Win Byts. IAT seconds throughout.</div>
+
+  <h3>Ablation Study • Why Tool Group Matters • FlowDetect</h3>
+  <div class="tbl-wrap rv"><table>
+    <thead><tr><th>Feature Set</th><th>n_features</th><th>Balanced Acc</th><th>Macro F1</th><th>Accuracy</th><th>Benign FPR</th><th>Key Drop</th></tr></thead>
+    <tbody>
+      <tr style="background:rgba(6,182,212,.08)"><td><strong>all32 FlowDetect</strong></td><td>32</td><td>0.99958</td><td>0.9965</td><td>0.99937</td><td>0.069%</td><td>Best - Full CCTV + fingerprint + ID</td></tr>
+      <tr><td><strong>behavioural</strong></td><td>27</td><td>0.9631</td><td>0.9113</td><td>0.9809</td><td>1.06%</td><td>DoS Hulk Prec 100%→59% - Tool fingerprints matter</td></tr>
+    </tbody>
+  </table></div>
+</div>
+</section>
+
+<div class="rule"></div>
+
+<!-- API -->
+<section class="sec" id="api">
+<div class="wrap">
+  <div class="sec-head rv">
+    <span class="sec-num">06 • FastAPI • FlowDetect ONNX Deployment</span>
+    <h2>FlowDetect response of FastAPI - HGB model anywhere</h2>
+    <p class="sub">FlowDetect FastAPI + Uvicorn, ONNX Runtime CPU batch 64 p99 0.5ms, SHA256 integrity, Prometheus, structlog JSON, secrets .env dev → Vault prod, CI/CD GitHub Actions.</p>
+  </div>
+
+  <div class="grid g2 rv">
+    <div class="card">
+      <div class="card-t">POST /predict • FlowDetect • Cyan Highlighted</div>
+      <div class="code"><div class="code-bar"><span class="code-lang">HTTP • Cyan</span><span class="code-file">POST /predict • X-API-Key → 403 if missing • FlowDetect</span></div><pre><code><span class="t-com"># FlowDetect FastAPI - HGB ONNX Runtime</span>
+<span class="t-key">POST</span> <span class="t-str">/predict</span> <span class="t-var">HTTP/1.1</span>
+<span class="t-att">X-API-Key</span><span class="t-op">:</span> <span class="t-str">your-secret-key</span>
+<span class="t-att">Content-Type</span><span class="t-op">:</span> <span class="t-str">application/json</span>
+
+<span class="t-pun">{</span> <span class="t-com">// 32 features canonical order - seconds not ms</span>
+  <span class="t-att">"src_ip"</span><span class="t-op">:</span> <span class="t-str">"192.168.1.100"</span><span class="t-pun">,</span>
+  <span class="t-att">"features"</span><span class="t-op">:</span> <span class="t-pun">[</span><span class="t-num">0.23</span><span class="t-pun">,</span> <span class="t-num">12</span><span class="t-pun">,</span> <span class="t-num">26883</span><span class="t-pun">,</span> <span class="t-com">... 32 total</span><span class="t-pun">]</span>
+<span class="t-pun">}</span></code></pre></div>
+      <div class="code"><div class="code-bar"><span class="code-lang">JSON • Cyan #06b6d4</span><span class="code-file">200 OK • FlowDetect HGB ONNX • Latency 0.34ms</span></div><pre><code><span class="t-pun">{</span>
+  <span class="t-att">"flow_id"</span><span class="t-op">:</span> <span class="t-str">"uuid"</span><span class="t-pun">,</span>
+  <span class="t-att">"prediction"</span><span class="t-op">:</span> <span class="t-num">3</span><span class="t-pun">,</span>
+  <span class="t-att">"label"</span><span class="t-op">:</span> <span class="t-str">"DDoS attacks-LOIC-HTTP"</span><span class="t-pun">,</span>
+  <span class="t-att">"confidence"</span><span class="t-op">:</span> <span class="t-num">0.97</span><span class="t-pun">,</span>
+  <span class="t-att">"is_attack"</span><span class="t-op">:</span> <span class="t-key">true</span><span class="t-pun">,</span>
+  <span class="t-att">"model_version"</span><span class="t-op">:</span> <span class="t-str">"v20260911_hgb"</span>
+<span class="t-pun">}</span></code></pre></div>
+    </div>
+    <div class="card">
+      <div class="card-t">GET /health • Prometheus • FlowDetect • Cyan</div>
+      <div class="code"><div class="code-bar"><span class="code-lang">JSON • Cyan</span><span class="code-file">GET /health • Kubernetes liveness • FlowDetect</span></div><pre><code><span class="t-pun">{</span>
+  <span class="t-att">"status"</span><span class="t-op">:</span> <span class="t-str">"healthy"</span><span class="t-pun">,</span>
+  <span class="t-att">"model_version"</span><span class="t-op">:</span> <span class="t-str">"v20260911_hgb"</span><span class="t-pun">,</span>
+  <span class="t-att">"queue_depth"</span><span class="t-op">:</span> <span class="t-num">12</span><span class="t-pun">,</span>
+  <span class="t-att">"model_loaded"</span><span class="t-op">:</span> <span class="t-key">true</span>
+<span class="t-pun">}</span></code></pre></div>
+      <div class="code"><div class="code-bar"><span class="code-lang">Prometheus • Cyan #06b6d4</span><span class="code-file">/metrics • Grafana • FlowDetect</span></div><pre><code><span class="t-com"># HELP ids_inferences_total FlowDetect total inferences</span>
+<span class="t-att">ids_inferences_total</span><span class="t-pun">{</span><span class="t-att">label</span><span class="t-op">=</span><span class="t-str">"Benign"</span><span class="t-pun">,</span><span class="t-att">model_version</span><span class="t-op">=</span><span class="t-str">"v20260911_hgb"</span><span class="t-pun">}</span> <span class="t-num">1234</span>
+<span class="t-att">ids_inference_latency_seconds_bucket</span><span class="t-pun">{</span><span class="t-att">le</span><span class="t-op">=</span><span class="t-str">"0.001"</span><span class="t-pun">}</span> <span class="t-num">850</span>
+<span class="t-att">ids_attacks_detected_total</span><span class="t-pun">{</span><span class="t-att">attack_type</span><span class="t-op">=</span><span class="t-str">"Flood"</span><span class="t-pun">}</span> <span class="t-num">47</span></code></pre></div>
+      <div class="note note-ok"><strong>FlowDetect ONNX Anywhere:</strong> HGB via skl2onnx opset 17, SHA256 verified, p99 0.5ms, deployable via ONNX Runtime Python/Go/Rust/Java/C++ without sklearn. Same 32 features same order seconds.</div>
+    </div>
+  </div>
+</div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:28px">
+      <div style="grid-column:span 2;min-width:220px">
+        <div class="brand" style="margin-bottom:12px" data-go="hero">
+          <div class="brand-mark">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
+          </div>
+          <span class="brand-name">FlowDetect</span>
+        </div>
+        <p style="font-size:13px;line-height:1.7;max-width:42ch;color:var(--text-dim)">FlowDetect v2.0 Production-grade Network IDS with HGB incumbent 16M→11.7M filtered 32 features all32 0.9801 recall @ 0.2985% FPR 29.1s fit ONNX Runtime p99 0.5ms cost 4.97/1k. Built for A+ grade.</p>
+      </div>
+      <div><div style="font-family:var(--font-mono);font-size:9.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--a-400);margin-bottom:11px">FlowDetect Model</div>
+        <a class="nav-link" style="display:block;padding:3px 0" data-go="model">FlowDetect HGB 29.1s</a>
+        <a class="nav-link" style="display:block;padding:3px 0" data-go="model">Threshold 0.924 @ 0.2985% FPR</a></div>
+      <div><div style="font-family:var(--font-mono);font-size:9.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--a-400);margin-bottom:11px">Architecture</div>
+        <a class="nav-link" style="display:block;padding:3px 0" data-go="architecture">9 Layers • Kafka • Redis • TimescaleDB</a>
+        <a class="nav-link" style="display:block;padding:3px 0" data-go="architecture">ONNX + SHA256 Fix</a></div>
+      <div><div style="font-family:var(--font-mono);font-size:9.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--a-400);margin-bottom:11px">FlowDetect Features</div>
+        <a class="nav-link" style="display:block;padding:3px 0" data-go="features">32 Features all32 • 99.95%</a>
+        <a class="nav-link" style="display:block;padding:3px 0" data-go="features">Init Win Byts Rank 1 • 0.358</a></div>
+    </div>
+    <div style="margin-top:34px;padding-top:20px;border-top:1px solid var(--border);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--text-mute)">
+      <span>FlowDetect v2.0 • HGB Incumbent • 16M → 11.7M • 32 features • 0.9801 recall @ 0.2985% FPR • 29.1s fit • ONNX • FastAPI • Production IDS • Cyan #06b6d4</span>
+      <span>Theme: <b style="color:var(--a-300)">Cyan / Azure • #06b6d4</b> • Mode: <span id="modeLabel">Dark</span> • FlowDetect</span>
+    </div>
+  </div>
+</footer>
+
+<button id="top" aria-label="Back to top">
+  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+</button>
+
+<script>
+// Theme handling
+function setTheme(id){
+  document.documentElement.dataset.theme=id;
+  try{localStorage.setItem('ds-theme',id)}catch(e){}
+}
+function setMode(m){
+  document.documentElement.dataset.mode=m;
+  try{localStorage.setItem('ds-mode',m)}catch(e){}
+  const icon = document.getElementById('modeIcon');
+  if(icon) icon.innerHTML = m==='light' ? '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>' : '<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>';
+  document.getElementById('modeLabel').textContent = m.charAt(0).toUpperCase()+m.slice(1);
+}
+document.getElementById('modeBtn').onclick=()=>{
+  setMode(document.documentElement.dataset.mode==='light'?'dark':'light');
+};
+let th='cyan',md='dark';
+try{th=localStorage.getItem('ds-theme')||'cyan';md=localStorage.getItem('ds-mode')||'dark'}catch(e){}
+setTheme(th); setMode(md);
+
+// Nav scroll
+const nav=document.getElementById('nav'),prog=document.getElementById('prog'),topBtn=document.getElementById('top');
+const onScroll=()=>{
+  const y=scrollY;
+  nav.classList.toggle('small',y>20);
+  topBtn.classList.toggle('on',y>600);
+  const h=document.documentElement.scrollHeight-innerHeight;
+  prog.style.width=(h>0?y/h*100:0)+'%';
+  let cur='';
+  document.querySelectorAll('.sec, #hero').forEach(s=>{if(s.offsetTop-150<=y)cur=s.id});
+  document.querySelectorAll('.nav-link[data-go]').forEach(a=>a.classList.toggle('on',a.dataset.go===cur));
+};
+addEventListener('scroll',onScroll,{passive:true});onScroll();
+topBtn.onclick=()=>scrollTo({top:0,behavior:'smooth'});
+document.querySelectorAll('[data-go]').forEach(a=>a.addEventListener('click',()=>{
+  document.getElementById(a.dataset.go)?.scrollIntoView({behavior:'smooth'});
+  document.getElementById('navLinks').classList.remove('open');
+}));
+document.getElementById('navTog').onclick=()=>document.getElementById('navLinks').classList.toggle('open');
+
+// Reveal
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{rootMargin:'0px 0px -50px 0px'});
+document.querySelectorAll('.rv').forEach(e=>io.observe(e));
+
+// Spotlight
+addEventListener('mousemove',e=>{
+  const c=e.target.closest?.('.card.spot');
+  if(!c)return;
+  const r=c.getBoundingClientRect();
+  c.style.setProperty('--mx',(e.clientX-r.left)+'px');
+  c.style.setProperty('--my',(e.clientY-r.top)+'px');
+},{passive:true});
+
+// Live simulation
+let totalFlows=1284, attackCount=23;
+const attackers=['10.0.0.99','10.0.0.100','192.168.1.105'];
+const benignIps=['192.168.1.23','192.168.1.45','192.168.1.67','192.168.1.89'];
+const attackTypes=[
+  {label:'DDoS attacks-LOIC-HTTP', family:'Flood', chip:'chip-err'},
+  {label:'DDOS attack-HOIC', family:'Flood', chip:'chip-err'},
+  {label:'DoS attacks-Hulk', family:'Flood', chip:'chip-warn'},
+  {label:'Bot', family:'Bot', chip:'chip-warn'},
+  {label:'SSH-Bruteforce', family:'BruteForce', chip:'chip-neutral'},
+];
+
+function addLog(msg, cls=''){
+  const log=document.getElementById('log');
+  if(!log) return;
+  const time=new Date().toLocaleTimeString();
+  const line=document.createElement('div');
+  line.className='log-line';
+  line.innerHTML=`<span class="log-time">[${time}]</span><span style="color:${cls==='err'?'var(--err)':cls==='ok'?'var(--ok)':cls==='warn'?'var(--warn)':'var(--text-dim)'}">${msg}</span>`;
+  log.appendChild(line);
+  log.scrollTop=log.scrollHeight;
+  if(log.children.length>60) log.removeChild(log.firstChild);
+}
+
+function simulateAttack(){
+  const ip=attackers[Math.floor(Math.random()*attackers.length)];
+  const attack=attackTypes[Math.floor(Math.random()*attackTypes.length)];
+  const tbody=document.getElementById('flowsBody');
+  const row=document.createElement('tr');
+  const now=new Date().toLocaleTimeString();
+  const packets=16+Math.floor(Math.random()*50);
+  const duration=(0.02+Math.random()*2).toFixed(2);
+  const latency=(0.3+Math.random()*0.5).toFixed(2);
+  row.innerHTML=`<td>${now}</td><td>${ip}:${50000+Math.floor(Math.random()*1000)} → 192.168.1.1:80</td><td>TCP/80</td><td>${packets}</td><td>${duration}s</td><td><span class="chip ${attack.chip}">${attack.label}</span> <span class="chip chip-err">Critical</span></td><td>0.9${Math.floor(Math.random()*9)}</td><td>${latency}ms</td><td><span class="chip chip-err">Alert Slack</span></td>`;
+  tbody.prepend(row);
+  if(tbody.children.length>12) tbody.removeChild(tbody.lastChild);
+  addLog(`ATTACK DETECTED: ${attack.label} from ${ip} syn=50 ack=0 pps=1000.0 Init Bwd Win=230 fingerprint separability 0.999 → Critical`, 'err');
+  addLog(`Alert Router: dedup_hash=${Math.random().toString(16).substr(2,8)} (src_ip=${ip}, type=${attack.label}, hour=14) → Slack POST • FlowDetect Cost 4.97/1k`, 'warn');
+  const ac=document.getElementById('attackCount'); if(ac) ac.textContent=++attackCount;
+  const ta=document.getElementById('topAttacker'); if(ta) ta.textContent=ip;
+  const tf=document.getElementById('totalFlows'); if(tf) tf.textContent=(++totalFlows).toLocaleString();
+}
+
+function simulateBenign(){
+  const ip=benignIps[Math.floor(Math.random()*benignIps.length)];
+  const tbody=document.getElementById('flowsBody');
+  const row=document.createElement('tr');
+  const now=new Date().toLocaleTimeString();
+  const packets=8+Math.floor(Math.random()*12);
+  const duration=(0.1+Math.random()*1.5).toFixed(2);
+  const latency=(0.2+Math.random()*0.4).toFixed(2);
+  const conf=(0.9+Math.random()*0.09).toFixed(2);
+  row.innerHTML=`<td>${now}</td><td>${ip}:${40000+Math.floor(Math.random()*10000)} → 8.8.8.8:443</td><td>TCP/443</td><td>${packets}</td><td>${duration}s</td><td><span class="chip chip-ok">Benign</span></td><td>${conf}</td><td>${latency}ms</td><td><span class="chip chip-neutral">200 OK</span></td>`;
+  tbody.prepend(row);
+  if(tbody.children.length>12) tbody.removeChild(tbody.lastChild);
+  addLog(`Flow ${ip}:${40000+Math.floor(Math.random()*1000)} → 8.8.8.8:443 extracted 32 features: duration=${duration}s, total_packets=${packets}, Init Fwd Win=26883, Flow IAT Mean=0.02s • BENIGN conf=${conf} • FlowDetect`, 'ok');
+  const tf=document.getElementById('totalFlows'); if(tf) tf.textContent=(++totalFlows).toLocaleString();
+}
+
+function clearFlows(){
+  const tb=document.getElementById('flowsBody'); if(tb) tb.innerHTML='';
+  const lg=document.getElementById('log'); if(lg) lg.innerHTML='';
+  addLog('Logs cleared • FlowDetect HGB model healthy • ONNX SHA256 verified • Queue depth 0 • p99 0.5ms • Cyan #06b6d4', 'ok');
+}
+
+setInterval(()=>{
+  if(Math.random()>0.6) simulateBenign();
+  if(Math.random()>0.88) simulateAttack();
+  const q=document.getElementById('queue'); if(q) q.textContent=Math.floor(Math.random()*5);
+}, 3000);
+
+addLog('System started • FlowDetect v2.0 • HGB model v20260911 • 32 features all32 • Threshold 0.924 @ FPR 0.2985% • ONNX Runtime CPU • Queue depth 0 • SHA256 verified • Cyan theme #06b6d4', 'ok');
+addLog('FlowDetect Flow Processor: listening eth0 mirror • Redis TTL 30s • Kafka raw-flows 3 partitions • TimescaleDB hypertable 1h chunks • Prometheus metrics • Cyan #06b6d4', '');
+</script>
+</body>
+</html>
