@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-theme="cyan" data-mode="dark">
+<html lang="en" data-theme="mono" data-mode="dark">
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
@@ -11,7 +11,7 @@
 <script>
   try{
     var d=document.documentElement;
-    d.dataset.theme=localStorage.getItem('ds-theme')||'cyan';
+    d.dataset.theme=localStorage.getItem('ds-theme')||'mono';
     d.dataset.mode=localStorage.getItem('ds-mode')||'dark';
   }catch(e){}
 </script>
@@ -39,12 +39,13 @@
   --ease:cubic-bezier(.22,1,.36,1);
   --dur-fast:.15s; --dur:.28s; --dur-slow:.5s;
   --maxw:1200px;
-  /* Syntax tokens - cyan theme */
+  /* Syntax tokens - mono grayscale theme */
   --sx-com:#5c6470; --sx-key:var(--a-400); --sx-str:#9ece6a; --sx-num:#ff9e64;
   --sx-fn:#7aa2f7; --sx-typ:#5bd6c6; --sx-op:#8b95a5; --sx-tag:#7ee0a8;
   --sx-att:#f0a35e; --sx-pun:#7d8797; --sx-bul:#f2789b; --sx-var:#ccd4de;
 }
 [data-theme="cyan"]{--a-50:#ecfeff;--a-100:#cffafe;--a-200:#a5f3fc;--a-300:#67e8f9;--a-400:#22d3ee;--a-500:#06b6d4;--a-600:#0891b2;--a-700:#0e7490;--a-800:#155e75;--a-900:#164e63;--a-rgb:6,182,212;--a-glow:34,211,238;--a-grad:linear-gradient(135deg,#06b6d4,#3b82f6);--a-name:"Cyan / Azure"}
+[data-theme="mono"]{--a-50:#fafafa;--a-100:#f5f5f5;--a-200:#e5e5e5;--a-300:#d4d4d4;--a-400:#a3a3a3;--a-500:#e5e5e5;--a-600:#d4d4d4;--a-700:#a3a3a3;--a-800:#737373;--a-900:#525252;--a-rgb:229,229,229;--a-glow:255,255,255;--a-grad:linear-gradient(135deg,#fff,#a3a3a3);--a-name:"Monochrome / Steel"}
 [data-mode="light"]{
   --bg:#fbfbfd; --bg-elevated:#fff; --bg-sunken:#f2f3f6;
   --surface:rgba(0,0,0,.025); --surface-2:rgba(0,0,0,.045);
@@ -98,40 +99,127 @@ body::before{content:'';position:fixed;inset:0;z-index:9999;opacity:.045;pointer
   #navTog{display:grid}
 }
 
-/* HERO - FIXED TO FIT WHOLE SCREEN ALL DEVICES */
-#hero{position:relative;min-height:100dvh;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:96px 24px 40px;overflow:hidden;box-sizing:border-box}
-.rings{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;overflow:hidden}
-.rings-in{position:relative;width:min(72%,800px);height:min(78vh,720px)}
-.ring{position:absolute;left:0;right:0;height:95%;border-radius:100em;opacity:.8;border:1.5px solid rgba(var(--a-glow),.2);will-change:transform;box-shadow:inset 0 0 40px 5px rgba(var(--a-glow),.24),inset 0 0 100px 20px rgba(var(--a-glow),.14),0 0 60px 15px rgba(var(--a-glow),.14)}
-.ring-t{top:0;animation:rt 2s var(--ease) .1s both}
-.ring-b{bottom:0;animation:rb 2s var(--ease) .1s both}
-@keyframes rt{from{transform:translateY(-150%) scale(1.25);opacity:0}to{transform:translateY(-60%) scale(1.25);opacity:.8}}
-@keyframes rb{from{transform:translateY(150%) scale(1.4);opacity:0}to{transform:translateY(35%) scale(1.4);opacity:.8}}
-.hero-in{position:relative;z-index:5;max-width:920px;width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0}
-.kicker{font-family:var(--font-mono);font-size:10px;letter-spacing:.34em;text-transform:uppercase;color:var(--a-400);display:block;margin-bottom:14px;line-height:1.5}
-#hero h1{font-family:var(--font-display);font-weight:800;letter-spacing:-.035em;line-height:1.02;font-size:clamp(30px,6.2vw,62px);margin:0}
-.grad{background:var(--a-grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
-.hero-sub{color:var(--text-dim);font-size:clamp(14px,1.8vw,16.5px);max-width:68ch;margin:16px auto 0;line-height:1.65}
-.hero-sub b{color:var(--text);font-weight:700}
-.cta-row{display:flex;gap:11px;justify-content:center;flex-wrap:wrap;margin-top:22px}
-.stat-row{display:flex;gap:28px;justify-content:center;flex-wrap:wrap;margin-top:28px}
-.stat .v{font-family:var(--font-display);font-size:clamp(18px,2.6vw,26px);font-weight:800;color:var(--a-300);line-height:1}
-[data-mode="light"] .stat .v{color:var(--a-700)}
-.stat .l{font-family:var(--font-mono);font-size:8.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--text-mute);margin-top:5px;line-height:1.4}
-@media(max-height:800px){
-  #hero{padding:84px 20px 24px}
-  #hero h1{font-size:clamp(26px,5.2vw,48px)}
-  .hero-sub{margin-top:10px;font-size:13.5px}
-  .cta-row{margin-top:16px}
-  .stat-row{margin-top:18px;gap:18px}
+/* HERO - PREMIUM BLACK-AND-DARK GRAYSCALE AI/ML INFRASTRUCTURE */
+#hero{position:relative;min-height:100dvh;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;text-align:center;padding:88px 24px 36px;overflow:hidden;box-sizing:border-box;background:#050507}
+.hero-infra-bg{position:absolute;inset:0;z-index:0;overflow:hidden;background:#050507}
+.hero-infra-bg::before{content:'';position:absolute;inset:0;background:
+  radial-gradient(1200px circle at 20% 15%,rgba(255,255,255,.06) 0%,transparent 55%),
+  radial-gradient(900px circle at 80% 85%,rgba(255,255,255,.04) 0%,transparent 60%),
+  radial-gradient(700px circle at 50% 50%,rgba(26,29,36,.8) 0%,transparent 70%),
+  linear-gradient(180deg,#050507 0%,#0a0c10 35%,#050507 100%)}
+.hero-grid{position:absolute;inset:0;opacity:.06;background-size:64px 64px;background-image:
+  linear-gradient(rgba(255,255,255,.12) 1px,transparent 1px),
+  linear-gradient(90deg,rgba(255,255,255,.12) 1px,transparent 1px)}
+.hero-charcoal-grad{position:absolute;inset:0;background:
+  linear-gradient(90deg,transparent 0%,rgba(42,46,57,.12) 20%,rgba(42,46,57,.06) 50%,rgba(42,46,57,.12) 80%,transparent 100%),
+  linear-gradient(180deg,transparent 0%,rgba(10,12,16,.6) 100%)}
+.hero-atmo-light{position:absolute;inset:0;background:
+  radial-gradient(600px circle at 50% 0%,rgba(255,255,255,.07),transparent 60%),
+  radial-gradient(800px circle at 50% 100%,rgba(255,255,255,.03),transparent 70%)}
+
+/* INFRA STAGE - Cinematic wide layout */
+.infra-stage{position:relative;z-index:1;width:100%;max-width:1100px;height:min(48vh,440px);min-height:300px;margin:0 auto 8px;display:flex;align-items:center;justify-content:center;perspective:1200px;perspective-origin:50% 50%}
+.infra-center{position:relative;width:100%;height:100%;display:flex;align-items:center;justify-content:center;transform-style:preserve-3d}
+.core-wrap{position:relative;z-index:5;width:148px;height:148px;display:grid;place-items:center;transform-style:preserve-3d;transition:transform .6s var(--ease)}
+.glass-core{position:relative;width:112px;height:112px;transform-style:preserve-3d;animation:coreFloat 6s ease-in-out infinite}
+@keyframes coreFloat{0%,100%{transform:translateY(0) rotateX(12deg) rotateY(-18deg)}50%{transform:translateY(-10px) rotateX(18deg) rotateY(-28deg)}}
+.cube{position:relative;width:100%;height:100%;transform-style:preserve-3d;animation:cubeSpin 22s linear infinite}
+@keyframes cubeSpin{from{transform:rotateX(0) rotateY(0)}to{transform:rotateX(360deg) rotateY(360deg)}}
+.cube .face{position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.09),rgba(255,255,255,.02));backdrop-filter:blur(16px) saturate(160%);-webkit-backdrop-filter:blur(16px) saturate(160%);border:1px solid rgba(255,255,255,.14);box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 8px 32px rgba(0,0,0,.6),0 0 24px rgba(255,255,255,.08)}
+.cube .front{transform:translateZ(56px)}
+.cube .back{transform:rotateY(180deg) translateZ(56px)}
+.cube .right{transform:rotateY(90deg) translateZ(56px)}
+.cube .left{transform:rotateY(-90deg) translateZ(56px)}
+.cube .top{transform:rotateX(90deg) translateZ(56px);background:linear-gradient(135deg,rgba(255,255,255,.14),rgba(255,255,255,.04))}
+.cube .bottom{transform:rotateX(-90deg) translateZ(56px)}
+.core-inner-glow{position:absolute;inset:18%;background:radial-gradient(circle,rgba(255,255,255,.18) 0%,rgba(255,255,255,.04) 40%,transparent 70%);filter:blur(8px);animation:innerPulse 3s ease-in-out infinite}
+@keyframes innerPulse{0%,100%{opacity:.6;transform:scale(1)}50%{opacity:1;transform:scale(1.15)}}
+.core-pulse{position:absolute;inset:-24px;border:1px solid rgba(255,255,255,.12);border-radius:12px;animation:pulseRing 4s ease-out infinite}
+.core-pulse::after{content:'';position:absolute;inset:-12px;border:1px solid rgba(255,255,255,.06);border-radius:16px;animation:pulseRing 4s ease-out infinite .8s}
+@keyframes pulseRing{0%{transform:scale(.9);opacity:0}20%{opacity:.6}100%{transform:scale(1.4);opacity:0}}
+
+/* MONOLITHIC BLOCKS - Matte black, graphite, gunmetal, silver */
+.infra-blocks{position:absolute;inset:0;pointer-events:none}
+.mono-block{position:absolute;width:64px;height:64px;transform-style:preserve-3d;transition:transform .4s var(--ease),filter .4s}
+.mono-block:hover{filter:brightness(1.3)}
+.mono-block .block-top{position:absolute;inset:0;background:linear-gradient(135deg,#2a2e39 0%,#1c1f28 50%,#15181f 100%);border:1px solid rgba(255,255,255,.12);transform:rotateX(60deg) rotateZ(45deg) translateZ(18px);box-shadow:0 4px 12px rgba(0,0,0,.6)}
+.mono-block .block-front{position:absolute;left:0;right:0;top:50%;height:36px;background:linear-gradient(180deg,#0f1115 0%,#0a0c10 100%);border:1px solid rgba(255,255,255,.08);border-top:0;transform:rotateX(-12deg) translateY(8px);opacity:.9}
+.mono-block .block-side{position:absolute;top:0;bottom:0;right:-8px;width:14px;background:linear-gradient(90deg,#1a1d24,#0f1115);border:1px solid rgba(255,255,255,.06);transform:skewY(-12deg);opacity:.8}
+.mono-block .block-node{position:absolute;top:50%;left:50%;width:8px;height:8px;margin:-4px 0 0 -4px;background:#fff;border-radius:50%;box-shadow:0 0 8px #fff,0 0 16px rgba(255,255,255,.6);animation:nodePulse 2.4s ease-in-out infinite}
+@keyframes nodePulse{0%,100%{opacity:.6;transform:scale(1)}50%{opacity:1;transform:scale(1.4)}}
+.block-ml{left:18%;top:18%;animation:blockFloat 7s ease-in-out infinite}
+.block-ai{right:18%;top:18%;animation:blockFloat 7s ease-in-out infinite .8s}
+.block-auto{left:18%;bottom:18%;animation:blockFloat 7s ease-in-out infinite 1.6s}
+.block-data{right:18%;bottom:18%;animation:blockFloat 7s ease-in-out infinite 2.4s}
+@keyframes blockFloat{0%,100%{transform:translateY(0) rotateX(10deg) rotateZ(-6deg)}50%{transform:translateY(-8px) rotateX(14deg) rotateZ(-10deg)}}
+
+/* DATA STREAMS - Thin glowing white/gray */
+.streams{position:absolute;inset:0;z-index:2;pointer-events:none;width:100%;height:100%}
+.stream-line{fill:none;stroke:rgba(255,255,255,.14);stroke-width:1;stroke-dasharray:8 12;animation:streamFlow 1.2s linear infinite}
+.stream-line:nth-child(2){animation-delay:.3s;stroke:rgba(255,255,255,.10)}
+.stream-line:nth-child(3){animation-delay:.6s}
+.stream-line:nth-child(4){animation-delay:.9s;stroke:rgba(255,255,255,.12)}
+@keyframes streamFlow{to{stroke-dashoffset:-40}}
+
+.particles{position:absolute;inset:0;z-index:3;pointer-events:none}
+.particle{position:absolute;width:3px;height:3px;background:#fff;border-radius:50%;box-shadow:0 0 6px #fff,0 0 12px rgba(255,255,255,.8);animation:particleMove var(--dur) linear infinite}
+@keyframes particleMove{0%{transform:translate(var(--sx),var(--sy)) scale(0);opacity:0}10%{opacity:1;transform:translate(var(--sx),var(--sy)) scale(1)}90%{opacity:1}100%{transform:translate(var(--ex),var(--ey)) scale(0);opacity:0}}
+
+/* FLOATING LABELS - Monochromatic */
+.infra-labels{position:absolute;inset:0;z-index:4;pointer-events:none}
+.i-label{position:absolute;display:flex;align-items:center;gap:6px;font-family:var(--font-mono);font-size:8px;letter-spacing:.22em;text-transform:uppercase;color:#8a8f9a;background:rgba(10,12,16,.8);border:1px solid rgba(255,255,255,.08);padding:5px 10px;border-radius:999px;backdrop-filter:blur(8px);transition:all .3s}
+.i-label .i-dot{width:5px;height:5px;border-radius:50%;background:#fff;box-shadow:0 0 6px #fff;flex:none;animation:nodePulse 2s infinite}
+.i-label .i-line{position:absolute;height:1px;background:linear-gradient(90deg,rgba(255,255,255,.2),transparent);pointer-events:none}
+.l-ml{left:6%;top:12%}
+.l-ml .i-line{width:60px;left:100%;top:50%;transform:rotate(18deg);transform-origin:left}
+.l-ai{right:6%;top:12%}
+.l-ai .i-line{width:60px;right:100%;top:50%;transform:rotate(-18deg);transform-origin:right}
+.l-auto{left:6%;bottom:12%}
+.l-auto .i-line{width:60px;left:100%;top:50%;transform:rotate(-18deg);transform-origin:left}
+.l-data{right:6%;bottom:12%}
+.l-data .i-line{width:60px;right:100%;top:50%;transform:rotate(18deg);transform-origin:right}
+.l-alert{left:50%;bottom:2%;transform:translateX(-50%)}
+.l-alert .i-line{width:1px;height:24px;left:50%;bottom:100%;background:linear-gradient(180deg,transparent,rgba(255,255,255,.2))}
+
+/* HERO CONTENT - Premium black grayscale beautiful */
+.hero-in{position:relative;z-index:5;max-width:920px;width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;margin-top:8px}
+.kicker{font-family:var(--font-mono);font-size:9.5px;letter-spacing:.32em;text-transform:uppercase;color:#8a8f9a;display:block;margin-bottom:12px;line-height:1.5;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);padding:6px 14px;border-radius:999px;backdrop-filter:blur(8px)}
+#hero h1{font-family:var(--font-display);font-weight:800;letter-spacing:-.04em;line-height:.98;font-size:clamp(32px,6.8vw,68px);margin:0;color:#f4f5f7;text-shadow:0 2px 24px rgba(0,0,0,.8)}
+.grad{background:linear-gradient(135deg,#fff 0%,#c8cdd6 30%,#8a8f9a 60%,#fff 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 0 20px rgba(255,255,255,.15))}
+.hero-sub{color:#a1a7b3;font-size:clamp(13px,1.7vw,16px);max-width:66ch;margin:14px auto 0;line-height:1.7}
+.hero-sub b{color:#e6e8ec;font-weight:700}
+.cta-row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:20px}
+.stat-row{display:flex;gap:24px;justify-content:center;flex-wrap:wrap;margin-top:22px;padding:14px 18px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:16px;backdrop-filter:blur(12px)}
+.stat .v{font-family:var(--font-display);font-size:clamp(16px,2.4vw,22px);font-weight:800;color:#e6e8ec;line-height:1}
+.stat .l{font-family:var(--font-mono);font-size:7.5px;letter-spacing:.18em;text-transform:uppercase;color:#6d7480;margin-top:4px;line-height:1.4}
+.btn-primary{background:#fff;color:#050507;border:1px solid #fff}
+.btn-primary:hover{background:#e6e8ec;box-shadow:0 0 24px rgba(255,255,255,.3);transform:translateY(-1px)}
+.btn-ghost{background:rgba(255,255,255,.04);color:#e6e8ec;border:1px solid rgba(255,255,255,.12);backdrop-filter:blur(8px)}
+.btn-ghost:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.2)}
+@media(max-height:820px){
+  .infra-stage{height:min(42vh,360px);min-height:260px}
+  .hero-in{margin-top:4px}
+  #hero h1{font-size:clamp(26px,5.6vw,52px)}
+  .hero-sub{margin-top:8px;font-size:13px}
+  .cta-row{margin-top:14px}
+  .stat-row{margin-top:14px;gap:14px;padding:10px 14px}
 }
-@media(max-width:640px){
-  #hero{padding:88px 16px 28px;min-height:100dvh}
-  .rings-in{width:92%;height:72vh}
-  #hero h1{font-size:clamp(26px,8vw,38px);line-height:1.08}
-  .hero-sub{font-size:13.5px;margin-top:12px}
-  .stat-row{gap:16px;margin-top:20px}
-  .stat .v{font-size:16px}
+@media(max-width:768px){
+  #hero{padding:84px 16px 24px}
+  .infra-stage{height:38vh;min-height:240px}
+  .mono-block{width:48px;height:48px}
+  .mono-block .block-top{transform:rotateX(60deg) rotateZ(45deg) translateZ(12px)}
+  .block-ml{left:10%;top:14%}.block-ai{right:10%;top:14%}.block-auto{left:10%;bottom:14%}.block-data{right:10%;bottom:14%}
+  .i-label{font-size:7px;padding:4px 8px}
+  .i-label .i-line{display:none}
+  #hero h1{font-size:clamp(24px,8vw,36px)}
+  .stat-row{gap:12px;margin-top:16px}
+}
+@media(max-width:480px){
+  .infra-stage{height:32vh;min-height:200px}
+  .core-wrap{width:112px;height:112px}
+  .glass-core{width:84px;height:84px}
+  .cube .front{transform:translateZ(42px)}.cube .back{transform:rotateY(180deg) translateZ(42px)}.cube .right{transform:rotateY(90deg) translateZ(42px)}.cube .left{transform:rotateY(-90deg) translateZ(42px)}.cube .top{transform:rotateX(90deg) translateZ(42px)}.cube .bottom{transform:rotateX(-90deg) translateZ(42px)}
 }
 
 /* BUTTONS */
@@ -145,6 +233,28 @@ body::before{content:'';position:fixed;inset:0;z-index:9999;opacity:.045;pointer
 .btn-soft:hover{background:rgba(var(--a-rgb),.22)}
 .btn-sm{padding:7px 14px;font-size:12px;border-radius:var(--r-sm)}
 .btn-lg{padding:14px 30px;font-size:15px;border-radius:var(--r-lg)}
+/* MONO GRAYSCALE BEAUTIFUL OVERRIDES - Whole webpage grayscale dark */
+[data-theme="mono"] .btn-primary{background:#fff;color:#050507;border:1px solid #fff}
+[data-theme="mono"] .btn-primary:hover{background:#e5e5e5;box-shadow:0 0 24px rgba(255,255,255,.28);transform:translateY(-1px)}
+[data-theme="mono"] .btn-ghost{background:rgba(255,255,255,.04);color:#e6e8ec;border:1px solid rgba(255,255,255,.12);backdrop-filter:blur(8px)}
+[data-theme="mono"] .btn-ghost:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.2)}
+[data-theme="mono"] .chip{background:rgba(255,255,255,.06);color:#d4d4d4;border-color:rgba(255,255,255,.14)}
+[data-theme="mono"] .chip-ok{background:rgba(16,185,129,.13);color:#6ee7b7;border-color:rgba(16,185,129,.32)}
+[data-theme="mono"] .chip-warn{background:rgba(245,158,11,.13);color:#fcd34d;border-color:rgba(245,158,11,.32)}
+[data-theme="mono"] .chip-err{background:rgba(239,68,68,.13);color:#fca5a5;border-color:rgba(239,68,68,.32)}
+[data-theme="mono"] .sec-num{color:#a3a3a3}
+[data-theme="mono"] th{color:#a3a3a3}
+[data-theme="mono"] pre{border-left-color:#a3a3a3;box-shadow:0 0 20px rgba(255,255,255,.06)}
+[data-theme="mono"] .b-wire::before{background:linear-gradient(180deg,transparent,#a3a3a3 22%,#d4d4d4 50%,#a3a3a3 78%,transparent);box-shadow:0 0 6px rgba(255,255,255,.5),0 0 16px rgba(255,255,255,.25),0 0 34px rgba(255,255,255,.12)}
+[data-theme="mono"] .b-split{border-left-color:#d4d4d4}
+[data-theme="mono"] #prog{background:linear-gradient(135deg,#fff,#a3a3a3);box-shadow:0 0 12px rgba(255,255,255,.4)}
+[data-theme="mono"] #top{border-color:rgba(255,255,255,.2);background:rgba(255,255,255,.06);color:#e5e5e5}
+[data-theme="mono"] .brand-mark{background:linear-gradient(135deg,#fff,#a3a3a3);box-shadow:0 8px 20px rgba(255,255,255,.15)}
+/* HERO OVERRIDE - Premium black grayscale CTA */
+#hero .btn-primary{background:#fff;color:#050507;border:1px solid #fff}
+#hero .btn-primary:hover{background:#e6e8ec;box-shadow:0 0 24px rgba(255,255,255,.3);transform:translateY(-1px)}
+#hero .btn-ghost{background:rgba(255,255,255,.04);color:#e6e8ec;border:1px solid rgba(255,255,255,.12);backdrop-filter:blur(8px)}
+#hero .btn-ghost:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.2)}
 
 /* LAYOUT */
 .wrap{max-width:var(--maxw);margin:0 auto;padding:0 26px}
@@ -182,7 +292,7 @@ body::before{content:'';position:fixed;inset:0;z-index:9999;opacity:.045;pointer
 .chip-err{background:var(--err-bg);color:#f87171;border-color:rgba(239,68,68,.32)}
 .chip-neutral{background:var(--surface-2);color:var(--text-mute);border-color:var(--border)}
 
-/* CODE - FIXED CYAN THEME VISIBLE */
+/* CODE - MONO GRAYSCALE BEAUTIFUL */
 .code{position:relative;margin:12px 0}
 .code-bar{display:flex;align-items:center;gap:8px;padding:7px 12px;background:var(--bg-sunken);border:1px solid var(--border);border-bottom:0;border-radius:var(--r-md) var(--r-md) 0 0}
 .code-lang{font-family:var(--font-mono);font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--a-400)}
@@ -296,23 +406,25 @@ tbody tr:hover td{background:rgba(var(--a-rgb),.05)}
 .rv{opacity:0;transform:translateY(26px);transition:opacity .65s var(--ease),transform .65s var(--ease)}
 .rv.in{opacity:1;transform:none}
 
-/* CUSTOM - EQUAL HEIGHT FIX FOR LIVE LOGS vs FASTAPI */
+/* CUSTOM - FIXED TERMINAL NO GROW */
 .metric-v{font-family:var(--font-display);font-size:28px;font-weight:800;color:var(--a-300);line-height:1}
 [data-mode="light"] .metric-v{color:var(--a-700)}
 .metric-l{font-family:var(--font-mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--text-mute);margin-top:6px}
-#live .g2{grid-auto-rows:1fr;align-items:stretch}
-#live .g2 > .card{display:flex;flex-direction:column;height:100%;min-height:520px}
-#live .g2 > .card .log{flex:1;min-height:340px;max-height:none;height:100%}
-#live .g2 > .card .code{flex:0 0 auto}
-#live .g2 > .card .code pre{max-height:220px}
-.log{background:#08090c;border:1px solid var(--border);border-radius:var(--r-md);padding:14px;font-family:var(--font-mono);font-size:11px;line-height:1.7;overflow-y:auto;scrollbar-width:none}
-.log::-webkit-scrollbar{display:none}
-.log-line{margin:3px 0;display:flex;gap:8px}
+#live .g2{grid-template-columns:1fr 1fr;align-items:stretch}
+#live .g2 > .card{display:flex;flex-direction:column;height:520px;max-height:520px;min-height:520px;overflow:hidden}
+#live .g2 > .card .card-t{flex:none}
+#live .g2 > .card .log{flex:1;min-height:0;max-height:100%;overflow-y:auto;overflow-x:hidden}
+#live .g2 > .card .code{flex:none}
+#live .g2 > .card .code pre{max-height:180px;overflow-y:auto}
+.log{background:#08090c;border:1px solid var(--border);border-radius:var(--r-md);padding:14px;font-family:var(--font-mono);font-size:11px;line-height:1.7;scrollbar-width:thin;scrollbar-color:rgba(var(--a-rgb),.25) transparent}
+.log::-webkit-scrollbar{width:4px}
+.log::-webkit-scrollbar-thumb{background:rgba(var(--a-rgb),.25);border-radius:99px}
+.log-line{margin:3px 0;display:flex;gap:8px;flex-shrink:0}
 .log-time{color:var(--text-faint);flex-shrink:0}
 @media(max-width:900px){
-  #live .g2{grid-auto-rows:auto}
-  #live .g2 > .card{min-height:auto}
-  #live .g2 > .card .log{min-height:260px;max-height:320px}
+  #live .g2{grid-template-columns:1fr;grid-auto-rows:auto}
+  #live .g2 > .card{height:460px;max-height:460px;min-height:460px}
+  #live .g2 > .card .log{min-height:0}
 }
 
 html,body{scrollbar-width:none;-ms-overflow-style:none}
@@ -366,22 +478,76 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{width:0;height:0;display:none}
 </nav>
 
 <header id="hero">
-  <div class="rings" aria-hidden="true"><div class="rings-in"><div class="ring ring-t"></div><div class="ring ring-b"></div></div></div>
+  <div class="hero-infra-bg" aria-hidden="true">
+    <div class="hero-grid"></div>
+    <div class="hero-charcoal-grad"></div>
+    <div class="hero-atmo-light"></div>
+  </div>
+
+  <div class="infra-stage" id="infraStage">
+    <div class="infra-center">
+      <div class="core-wrap" id="coreWrap">
+        <div class="glass-core">
+          <div class="cube">
+            <div class="face front"></div>
+            <div class="face back"></div>
+            <div class="face right"></div>
+            <div class="face left"></div>
+            <div class="face top"></div>
+            <div class="face bottom"></div>
+            <div class="core-inner-glow"></div>
+          </div>
+          <div class="core-pulse"></div>
+        </div>
+      </div>
+
+      <div class="infra-blocks">
+        <div class="mono-block block-ml" title="ML MODEL - HGB 29.1s fit 0.9801 recall">
+          <div class="block-top"></div><div class="block-front"></div><div class="block-side"></div><div class="block-node"></div>
+        </div>
+        <div class="mono-block block-ai" title="REAL-TIME INFERENCE - ONNX p99 0.5ms batch 64">
+          <div class="block-top"></div><div class="block-front"></div><div class="block-side"></div><div class="block-node"></div>
+        </div>
+        <div class="mono-block block-auto" title="AUTOMATION - Alert Router dedup 60s">
+          <div class="block-top"></div><div class="block-front"></div><div class="block-side"></div><div class="block-node"></div>
+        </div>
+        <div class="mono-block block-data" title="DATA PIPELINE - Kafka 3 partitions Redis TTL 30s">
+          <div class="block-top"></div><div class="block-front"></div><div class="block-side"></div><div class="block-node"></div>
+        </div>
+      </div>
+
+      <svg class="streams" viewBox="0 0 800 500" preserveAspectRatio="none" aria-hidden="true">
+        <path class="stream-line" d="M 140 120 Q 300 190 400 250" />
+        <path class="stream-line" d="M 660 120 Q 500 190 400 250" />
+        <path class="stream-line" d="M 140 380 Q 300 310 400 250" />
+        <path class="stream-line" d="M 660 380 Q 500 310 400 250" />
+      </svg>
+      <div class="particles" id="particles"></div>
+
+      <div class="infra-labels" aria-hidden="true">
+        <div class="i-label l-ml"><span class="i-dot"></span>ML MODEL<div class="i-line"></div></div>
+        <div class="i-label l-ai"><span class="i-dot"></span>REAL-TIME INFERENCE<div class="i-line"></div></div>
+        <div class="i-label l-auto"><span class="i-dot"></span>AUTOMATION<div class="i-line"></div></div>
+        <div class="i-label l-data"><span class="i-dot"></span>DATA PIPELINE<div class="i-line"></div></div>
+        <div class="i-label l-alert"><span class="i-dot"></span>ALERT ENGINE<div class="i-line"></div></div>
+      </div>
+    </div>
+  </div>
+
   <div class="hero-in">
-    <span class="kicker">FlowDetect v2.0 • Production-Grade Network IDS • HGB Incumbent</span>
-    <h1><span class="grad">FlowDetect</span><br>Network IDS that<br>catches 98% attacks<br>at 0.3% false alarms</h1>
-    <p class="hero-sub"><b>FlowDetect</b> is a production Network Intrusion Detection System trained on <b>16M flows (5.8GB)</b> filtered to 11.7M, using <b>HGB model</b> with 32 features, <b>cost-optimal threshold 0.924</b> at FPR 0.2985%, ONNX Runtime p99 0.5ms, deployed via FastAPI.</p>
+    <span class="kicker">FlowDetect v2.0 • Intelligent IDS • HGB • ONNX • Production</span>
+    <h1>Intelligent Systems.<br><span class="grad">Automated at Scale.</span></h1>
+    <p class="hero-sub"><b>FlowDetect</b> AI/ML-powered data intelligence and automated decision-making. Trained on <b>16M flows → 11.7M filtered</b>, <b>HGB model</b> 0.9801 recall @ 0.2985% FPR, <b>ONNX Runtime p99 0.5ms</b>, real-time packet-flow detection, inference and automation via FastAPI.</p>
     <div class="cta-row">
-      <button class="btn btn-primary btn-lg" data-go="live">View Live Monitoring
+      <button class="btn btn-primary btn-lg" data-go="live">Explore Platform
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
-      <button class="btn btn-ghost btn-lg" data-go="model">HGB Model Report</button>
-      <button class="btn btn-ghost btn-lg" data-go="api">FastAPI Response</button>
+      <button class="btn btn-ghost btn-lg" data-go="architecture">View Architecture</button>
     </div>
     <div class="stat-row">
-      <div class="stat"><div class="v">FlowDetect</div><div class="l">16M → 11.7M Filtered • 836MB Parquet</div></div>
-      <div class="stat"><div class="v">0.9801</div><div class="l">Recall @ FPR 0.2985% • HGB 29.1s</div></div>
-      <div class="stat"><div class="v">Cyan</div><div class="l">Theme • #06b6d4 • --a-500</div></div>
-      <div class="stat"><div class="v">4.97/1k</div><div class="l">Cost • 3.95 Alerts, 0.02 Misses</div></div>
+      <div class="stat"><div class="v">FlowDetect</div><div class="l">16M → 11.7M • 836MB Parquet • 32 Features</div></div>
+      <div class="stat"><div class="v">0.9801</div><div class="l">Recall @ 0.2985% FPR • HGB 29.1s Fit</div></div>
+      <div class="stat"><div class="v">0.5ms</div><div class="l">p99 ONNX • Batch 64 • SHA256 Verified</div></div>
+      <div class="stat"><div class="v">4.97/1k</div><div class="l">Cost • 3.95 Alerts, 0.02 Misses • Prior 0.001</div></div>
     </div>
   </div>
 </header>
@@ -439,7 +605,7 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{width:0;height:0;display:none}
   <div class="sec-head rv">
     <span class="sec-num">02 • Live Monitoring • FlowDetect</span>
     <h2>Real-time flow classification</h2>
-    <p class="sub">Live capture Scapy / AF_PACKET → Kafka raw-flows → Redis TTL 30s → 32 features → HGB ONNX batch 64 → Alert Router dedup 60s → TimescaleDB → Grafana 5s. FastAPI response below with cyan syntax highlighting.</p>
+    <p class="sub">Live capture Scapy / AF_PACKET → Kafka raw-flows → Redis TTL 30s → 32 features → HGB ONNX batch 64 → Alert Router dedup 60s → TimescaleDB → Grafana 5s. FastAPI response below with grayscale syntax highlighting, fixed terminal.</p>
   </div>
 
   <div class="grid g4 rv">
@@ -467,8 +633,8 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{width:0;height:0;display:none}
       <div class="log" id="log"></div>
     </div>
     <div class="card">
-      <div class="card-t">FastAPI Response • POST /predict • Cyan Syntax Highlighted</div>
-      <div class="code"><div class="code-bar"><span class="code-lang">JSON • Cyan #06b6d4</span><span class="code-file">Request • X-API-Key required → 403 if missing • FlowDetect</span></div><pre><code><span class="t-pun">{</span>
+      <div class="card-t">FastAPI Response • POST /predict • Grayscale Syntax Highlighted</div>
+      <div class="code"><div class="code-bar"><span class="code-lang">JSON • MONO</span><span class="code-file">Request • X-API-Key required → 403 if missing • FlowDetect</span></div><pre><code><span class="t-pun">{</span>
   <span class="t-att">"flow_id"</span><span class="t-op">:</span> <span class="t-str">"uuid"</span><span class="t-pun">,</span>
   <span class="t-att">"src_ip"</span><span class="t-op">:</span> <span class="t-str">"192.168.1.100"</span><span class="t-pun">,</span>
   <span class="t-att">"dst_ip"</span><span class="t-op">:</span> <span class="t-str">"10.0.0.1"</span><span class="t-pun">,</span>
@@ -478,7 +644,7 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{width:0;height:0;display:none}
   <span class="t-att">"timestamp"</span><span class="t-op">:</span> <span class="t-num">1700000000.0</span><span class="t-pun">,</span>
   <span class="t-att">"features"</span><span class="t-op">:</span> <span class="t-pun">[</span><span class="t-var">32 float values in canonical order</span><span class="t-pun">]</span>
 <span class="t-pun">}</span></code></pre></div>
-      <div class="code"><div class="code-bar"><span class="code-lang">JSON • Cyan Highlight</span><span class="code-file">200 OK • HGB ONNX • p99 0.5ms • FlowDetect</span></div><pre><code><span class="t-pun">{</span>
+      <div class="code"><div class="code-bar"><span class="code-lang">JSON • MONO Highlight</span><span class="code-file">200 OK • HGB ONNX • p99 0.5ms • FlowDetect</span></div><pre><code><span class="t-pun">{</span>
   <span class="t-att">"flow_id"</span><span class="t-op">:</span> <span class="t-str">"uuid"</span><span class="t-pun">,</span>
   <span class="t-att">"src_ip"</span><span class="t-op">:</span> <span class="t-str">"192.168.1.100"</span><span class="t-pun">,</span>
   <span class="t-att">"dst_ip"</span><span class="t-op">:</span> <span class="t-str">"10.0.0.1"</span><span class="t-pun">,</span>
@@ -490,12 +656,12 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{width:0;height:0;display:none}
   <span class="t-att">"model_version"</span><span class="t-op">:</span> <span class="t-str">"v20260911_hgb"</span><span class="t-pun">,</span>
   <span class="t-att">"inference_latency_ms"</span><span class="t-op">:</span> <span class="t-num">0.34</span>
 <span class="t-pun">}</span></code></pre></div>
-      <div class="row" style="margin-top:10px">
-        <button class="btn btn-primary btn-sm" onclick="simulateAttack()">Simulate DDoS Attack</button>
-        <button class="btn btn-ghost btn-sm" onclick="simulateBenign()">Simulate Benign</button>
-        <button class="btn btn-ghost btn-sm" onclick="clearFlows()">Clear Logs</button>
-      </div>
     </div>
+  </div>
+  <div class="row" style="justify-content:center;margin-top:16px">
+    <button class="btn btn-primary btn-sm" onclick="simulateAttack()">Simulate DDoS Attack</button>
+    <button class="btn btn-ghost btn-sm" onclick="simulateBenign()">Simulate Benign</button>
+    <button class="btn btn-ghost btn-sm" onclick="clearFlows()">Clear Logs</button>
   </div>
 </div>
 </section>
@@ -543,7 +709,7 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{width:0;height:0;display:none}
     <thead><tr><th>Model</th><th>Fit Seconds</th><th>Val Recall</th><th>Test Recall</th><th>Flood Recall</th><th>FP</th><th>FN</th><th>Cost/1k</th><th>Verdict</th></tr></thead>
     <tbody>
       <tr><td><strong>XGBoost</strong></td><td>212.4s</td><td>0.9777</td><td><strong>0.9804</strong></td><td>0.9748</td><td>1075</td><td>775</td><td>4.94</td><td>Best recall +14 p=0.35 NS</td></tr>
-      <tr style="background:rgba(6,182,212,.08);border-left:2px solid #06b6d4"><td><strong>FlowDetect HGB INCUMBENT</strong></td><td><strong>29.1s</strong></td><td>0.9770</td><td>0.9801</td><td>0.9744</td><td>1075</td><td>789</td><td>4.97</td><td><span class="chip chip-ok">KEEP - Fastest</span></td></tr>
+      <tr style="background:rgba(229,229,229,.08);border-left:2px solid #e5e5e5"><td><strong>FlowDetect HGB INCUMBENT</strong></td><td><strong>29.1s</strong></td><td>0.9770</td><td>0.9801</td><td>0.9744</td><td>1075</td><td>789</td><td>4.97</td><td><span class="chip chip-ok">KEEP - Fastest</span></td></tr>
       <tr><td>LightGBM</td><td>264.2s</td><td>0.9769</td><td>0.9794</td><td>0.9744</td><td>1075</td><td>816</td><td>5.04</td><td>9x slower</td></tr>
     </tbody>
   </table></div>
@@ -652,7 +818,7 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{width:0;height:0;display:none}
   <div class="sec-head rv">
     <span class="sec-num">05 • Features • FlowDetect 32 Canonical</span>
     <h2>FlowDetect behavioural vs tool fingerprints</h2>
-    <p class="sub">Single source of truth feature_schema.py enforced at train AND inference. IAT in seconds (Scapy time.time()). All 32 must match exactly or model invalid. Cyan chips show importance.</p>
+    <p class="sub">Single source of truth feature_schema.py enforced at train AND inference. IAT in seconds (Scapy time.time()). All 32 must match exactly or model invalid. Grayscale chips show importance in mono dark theme.</p>
   </div>
 
   <div class="tbl-wrap rv"><table>
@@ -671,7 +837,7 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{width:0;height:0;display:none}
   <div class="tbl-wrap rv"><table>
     <thead><tr><th>Feature Set</th><th>n_features</th><th>Balanced Acc</th><th>Macro F1</th><th>Accuracy</th><th>Benign FPR</th><th>Key Drop</th></tr></thead>
     <tbody>
-      <tr style="background:rgba(6,182,212,.08)"><td><strong>all32 FlowDetect</strong></td><td>32</td><td>0.99958</td><td>0.9965</td><td>0.99937</td><td>0.069%</td><td>Best - Full CCTV + fingerprint + ID</td></tr>
+      <tr style="background:rgba(229,229,229,.08)"><td><strong>all32 FlowDetect</strong></td><td>32</td><td>0.99958</td><td>0.9965</td><td>0.99937</td><td>0.069%</td><td>Best - Full CCTV + fingerprint + ID</td></tr>
       <tr><td><strong>behavioural</strong></td><td>27</td><td>0.9631</td><td>0.9113</td><td>0.9809</td><td>1.06%</td><td>DoS Hulk Prec 100%→59% - Tool fingerprints matter</td></tr>
     </tbody>
   </table></div>
@@ -691,8 +857,8 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{width:0;height:0;display:none}
 
   <div class="grid g2 rv">
     <div class="card">
-      <div class="card-t">POST /predict • FlowDetect • Cyan Highlighted</div>
-      <div class="code"><div class="code-bar"><span class="code-lang">HTTP • Cyan</span><span class="code-file">POST /predict • X-API-Key → 403 if missing • FlowDetect</span></div><pre><code><span class="t-com"># FlowDetect FastAPI - HGB ONNX Runtime</span>
+      <div class="card-t">POST /predict • FlowDetect • Grayscale Highlighted</div>
+      <div class="code"><div class="code-bar"><span class="code-lang">HTTP • MONO</span><span class="code-file">POST /predict • X-API-Key → 403 if missing • FlowDetect</span></div><pre><code><span class="t-com"># FlowDetect FastAPI - HGB ONNX Runtime</span>
 <span class="t-key">POST</span> <span class="t-str">/predict</span> <span class="t-var">HTTP/1.1</span>
 <span class="t-att">X-API-Key</span><span class="t-op">:</span> <span class="t-str">your-secret-key</span>
 <span class="t-att">Content-Type</span><span class="t-op">:</span> <span class="t-str">application/json</span>
@@ -701,7 +867,7 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{width:0;height:0;display:none}
   <span class="t-att">"src_ip"</span><span class="t-op">:</span> <span class="t-str">"192.168.1.100"</span><span class="t-pun">,</span>
   <span class="t-att">"features"</span><span class="t-op">:</span> <span class="t-pun">[</span><span class="t-num">0.23</span><span class="t-pun">,</span> <span class="t-num">12</span><span class="t-pun">,</span> <span class="t-num">26883</span><span class="t-pun">,</span> <span class="t-com">... 32 total</span><span class="t-pun">]</span>
 <span class="t-pun">}</span></code></pre></div>
-      <div class="code"><div class="code-bar"><span class="code-lang">JSON • Cyan #06b6d4</span><span class="code-file">200 OK • FlowDetect HGB ONNX • Latency 0.34ms</span></div><pre><code><span class="t-pun">{</span>
+      <div class="code"><div class="code-bar"><span class="code-lang">JSON • MONO #e5e5e5</span><span class="code-file">200 OK • FlowDetect HGB ONNX • Latency 0.34ms</span></div><pre><code><span class="t-pun">{</span>
   <span class="t-att">"flow_id"</span><span class="t-op">:</span> <span class="t-str">"uuid"</span><span class="t-pun">,</span>
   <span class="t-att">"prediction"</span><span class="t-op">:</span> <span class="t-num">3</span><span class="t-pun">,</span>
   <span class="t-att">"label"</span><span class="t-op">:</span> <span class="t-str">"DDoS attacks-LOIC-HTTP"</span><span class="t-pun">,</span>
@@ -711,14 +877,14 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{width:0;height:0;display:none}
 <span class="t-pun">}</span></code></pre></div>
     </div>
     <div class="card">
-      <div class="card-t">GET /health • Prometheus • FlowDetect • Cyan</div>
-      <div class="code"><div class="code-bar"><span class="code-lang">JSON • Cyan</span><span class="code-file">GET /health • Kubernetes liveness • FlowDetect</span></div><pre><code><span class="t-pun">{</span>
+      <div class="card-t">GET /health • Prometheus • FlowDetect • Grayscale</div>
+      <div class="code"><div class="code-bar"><span class="code-lang">JSON • MONO</span><span class="code-file">GET /health • Kubernetes liveness • FlowDetect</span></div><pre><code><span class="t-pun">{</span>
   <span class="t-att">"status"</span><span class="t-op">:</span> <span class="t-str">"healthy"</span><span class="t-pun">,</span>
   <span class="t-att">"model_version"</span><span class="t-op">:</span> <span class="t-str">"v20260911_hgb"</span><span class="t-pun">,</span>
   <span class="t-att">"queue_depth"</span><span class="t-op">:</span> <span class="t-num">12</span><span class="t-pun">,</span>
   <span class="t-att">"model_loaded"</span><span class="t-op">:</span> <span class="t-key">true</span>
 <span class="t-pun">}</span></code></pre></div>
-      <div class="code"><div class="code-bar"><span class="code-lang">Prometheus • Cyan #06b6d4</span><span class="code-file">/metrics • Grafana • FlowDetect</span></div><pre><code><span class="t-com"># HELP ids_inferences_total FlowDetect total inferences</span>
+      <div class="code"><div class="code-bar"><span class="code-lang">Prometheus • MONO #e5e5e5</span><span class="code-file">/metrics • Grafana • FlowDetect</span></div><pre><code><span class="t-com"># HELP ids_inferences_total FlowDetect total inferences</span>
 <span class="t-att">ids_inferences_total</span><span class="t-pun">{</span><span class="t-att">label</span><span class="t-op">=</span><span class="t-str">"Benign"</span><span class="t-pun">,</span><span class="t-att">model_version</span><span class="t-op">=</span><span class="t-str">"v20260911_hgb"</span><span class="t-pun">}</span> <span class="t-num">1234</span>
 <span class="t-att">ids_inference_latency_seconds_bucket</span><span class="t-pun">{</span><span class="t-att">le</span><span class="t-op">=</span><span class="t-str">"0.001"</span><span class="t-pun">}</span> <span class="t-num">850</span>
 <span class="t-att">ids_attacks_detected_total</span><span class="t-pun">{</span><span class="t-att">attack_type</span><span class="t-op">=</span><span class="t-str">"Flood"</span><span class="t-pun">}</span> <span class="t-num">47</span></code></pre></div>
@@ -753,8 +919,8 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{width:0;height:0;display:none}
         <a class="nav-link" style="display:block;padding:3px 0" data-go="features">Init Win Byts Rank 1 • 0.358</a></div>
     </div>
     <div style="margin-top:34px;padding-top:20px;border-top:1px solid var(--border);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--text-mute)">
-      <span>FlowDetect v2.0 • HGB Incumbent • 16M → 11.7M • 32 features • 0.9801 recall @ 0.2985% FPR • 29.1s fit • ONNX • FastAPI • Production IDS • Cyan #06b6d4</span>
-      <span>Theme: <b style="color:var(--a-300)">Cyan / Azure • #06b6d4</b> • Mode: <span id="modeLabel">Dark</span> • FlowDetect</span>
+      <span>FlowDetect v2.0 • HGB Incumbent • 16M → 11.7M • 32 features • 0.9801 recall @ 0.2985% FPR • 29.1s fit • ONNX • FastAPI • Production IDS • Mono Grayscale #e5e5e5 Dark Beautiful</span>
+      <span>Theme: <b style="color:var(--a-300)">Monochrome / Steel • #e5e5e5 • Grayscale Dark</b> • Mode: <span id="modeLabel">Dark</span> • FlowDetect</span>
     </div>
   </div>
 </footer>
@@ -779,8 +945,8 @@ function setMode(m){
 document.getElementById('modeBtn').onclick=()=>{
   setMode(document.documentElement.dataset.mode==='light'?'dark':'light');
 };
-let th='cyan',md='dark';
-try{th=localStorage.getItem('ds-theme')||'cyan';md=localStorage.getItem('ds-mode')||'dark'}catch(e){}
+let th='mono',md='dark';
+try{th=localStorage.getItem('ds-theme')||'mono';md=localStorage.getItem('ds-mode')||'dark'}catch(e){}
 setTheme(th); setMode(md);
 
 // Nav scroll
@@ -878,8 +1044,78 @@ function simulateBenign(){
 function clearFlows(){
   const tb=document.getElementById('flowsBody'); if(tb) tb.innerHTML='';
   const lg=document.getElementById('log'); if(lg) lg.innerHTML='';
-  addLog('Logs cleared • FlowDetect HGB model healthy • ONNX SHA256 verified • Queue depth 0 • p99 0.5ms • Cyan #06b6d4', 'ok');
+  addLog('Logs cleared • FlowDetect HGB model healthy • ONNX SHA256 verified • Queue depth 0 • p99 0.5ms • Mono Grayscale #e5e5e5', 'ok');
 }
+
+// ===== PREMIUM INFRA HERO - Particles + Parallax + Data Streams =====
+(function(){
+  const stage=document.getElementById('infraStage');
+  const coreWrap=document.getElementById('coreWrap');
+  const particlesEl=document.getElementById('particles');
+  if(!stage || !coreWrap || !particlesEl) return;
+
+  // Parallax on mouse move
+  let mx=0,my=0;
+  stage.addEventListener('mousemove', (e)=>{
+    const r=stage.getBoundingClientRect();
+    mx=(e.clientX - (r.left+r.width/2))/r.width;
+    my=(e.clientY - (r.top+r.height/2))/r.height;
+    coreWrap.style.transform=`translate3d(${mx*18}px,${my*12}px,0) rotateX(${my*-6}deg) rotateY(${mx*10}deg)`;
+    document.querySelectorAll('.mono-block').forEach((b,i)=>{
+      const factor=0.6 + i*0.15;
+      b.style.transform=`translate3d(${mx*28*factor}px,${my*18*factor}px,0) rotateX(${10+my*4}deg) rotateZ(${-6+mx*4}deg)`;
+    });
+    document.querySelectorAll('.i-label').forEach((l,i)=>{
+      l.style.transform=`translate3d(${mx*10*(i%2? -1:1)}px,${my*8}px,0)`;
+    });
+  });
+  stage.addEventListener('mouseleave',()=>{
+    coreWrap.style.transform='translate3d(0,0,0)';
+    document.querySelectorAll('.mono-block').forEach(b=>{
+      b.style.transform='';
+    });
+    document.querySelectorAll('.i-label').forEach(l=>{
+      if(l.classList.contains('l-alert')) l.style.transform='translateX(-50%)';
+      else l.style.transform='';
+    });
+  });
+
+  // Particles traveling from blocks to core
+  const routes=[
+    {sx:'18%',sy:'18%',ex:'50%',ey:'50%'},
+    {sx:'82%',sy:'18%',ex:'50%',ey:'50%'},
+    {sx:'18%',sy:'82%',ex:'50%',ey:'50%'},
+    {sx:'82%',sy:'82%',ex:'50%',ey:'50%'},
+  ];
+  function spawnParticle(){
+    const r=routes[Math.floor(Math.random()*routes.length)];
+    const p=document.createElement('div');
+    p.className='particle';
+    p.style.setProperty('--sx',r.sx);
+    p.style.setProperty('--sy',r.sy);
+    p.style.setProperty('--ex',r.ex);
+    p.style.setProperty('--ey',r.ey);
+    p.style.setProperty('--dur',(1.2+Math.random()*1.8)+'s');
+    p.style.left='0';p.style.top='0';
+    particlesEl.appendChild(p);
+    setTimeout(()=>p.remove(), 3000);
+  }
+  setInterval(spawnParticle, 180);
+  for(let i=0;i<6;i++) setTimeout(spawnParticle, i*120);
+
+  // Hover interaction on blocks - pulse core
+  document.querySelectorAll('.mono-block').forEach(b=>{
+    b.style.pointerEvents='auto';
+    b.addEventListener('mouseenter',()=>{
+      coreWrap.style.filter='brightness(1.4) drop-shadow(0 0 20px rgba(255,255,255,.4))';
+      document.querySelector('.glass-core').style.transform='scale(1.08)';
+    });
+    b.addEventListener('mouseleave',()=>{
+      coreWrap.style.filter='';
+      document.querySelector('.glass-core').style.transform='';
+    });
+  });
+})();
 
 setInterval(()=>{
   if(Math.random()>0.6) simulateBenign();
@@ -887,8 +1123,10 @@ setInterval(()=>{
   const q=document.getElementById('queue'); if(q) q.textContent=Math.floor(Math.random()*5);
 }, 3000);
 
-addLog('System started • FlowDetect v2.0 • HGB model v20260911 • 32 features all32 • Threshold 0.924 @ FPR 0.2985% • ONNX Runtime CPU • Queue depth 0 • SHA256 verified • Cyan theme #06b6d4', 'ok');
-addLog('FlowDetect Flow Processor: listening eth0 mirror • Redis TTL 30s • Kafka raw-flows 3 partitions • TimescaleDB hypertable 1h chunks • Prometheus metrics • Cyan #06b6d4', '');
+addLog('System started • FlowDetect v2.0 • HGB model v20260911 • 32 features all32 • Threshold 0.924 @ FPR 0.2985% • ONNX Runtime CPU • Queue depth 0 • SHA256 verified • Mono Grayscale #e5e5e5', 'ok');
+addLog('FlowDetect Flow Processor: listening eth0 mirror • Redis TTL 30s • Kafka raw-flows 3 partitions • TimescaleDB hypertable 1h chunks • Prometheus metrics • Mono #e5e5e5', '');
+addLog('Infra Visual: Glass Core • 4 Monolithic Blocks ML/AI/Automation/Data • White/gray data streams • Particles • Parallax • Hover • Pulsing nodes • Grayscale premium dark beautiful', 'ok');
 </script>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495" integrity="sha512-iIg7k2xntmwu6/uSb5tpc/hySgZc4eoL31yB29W6tJFo2akwjPWcEqnCEdJvGexCL0KEQwVYv5BlowfhVz26hg==" data-cf-beacon='{"version":"2024.11.0","token":"1954b47c125f43f8b4338b3c4f804e4f","spa":2}' crossorigin="anonymous"></script>
 </body>
 </html>
