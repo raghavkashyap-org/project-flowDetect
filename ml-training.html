@@ -122,7 +122,7 @@ McNemar test found XGBoost and HGB statistically indistinguishable
 <strong>0.00094&nbsp;ms/row</strong> batched &mdash; about 1.06 million rows per
 second, roughly 2,100&times; inside the 2&nbsp;ms budget. The export reproduces
 the native model's <strong>alert decisions exactly</strong> (0 gate flips on
-400,000 rows), and a 14-check audit reproduces every metric in the model card
+400,000 rows), and a 25-check audit reproduces every metric in the model card
 with zero delta on the full test split.</p>
 
 <div class="warn"><strong>Three things to carry forward.</strong>
@@ -168,13 +168,42 @@ pyarrow==15.0.2      # save samples/summaries as .parquet (small + fast)
 openpyxl==3.1.2      # export quality tables to Excel report
 scipy==1.12.0        # skew/kurtosis for distribution checks
 
-# --- modelling (was missing from this file; you already have it installed) --
+# --- modelling -------------------------------------------------------------
 #
-#  CHECK BEFORE INSTALLING:  pip show scikit-learn
-#  If that prints a version, pin it here instead of the range below. Changing
-#  sklearn changes HistGradientBoosting behaviour, and every number in your
-#  reports was produced by the version you currently have.
-scikit-learn&gt;=1.3
+#  WAS:  scikit-learn&gt;=1.3   with a TODO to pin it once the version was known.
+#  It is now known, from reports/deploy/model_metadata.json -&gt; environment,
+#  which was written by YOUR OWN export run, not guessed:
+#
+#      python 3.12.3 / sklearn 1.9.0 / numpy 1.26.4
+#
+#  So the range is replaced by an exact pin. Two measured reasons:
+#
+#  1. LOADING. reports/deploy/model.joblib is a pickle. Pickle records the
+#     module path of every class it stores, and HGB stores its loss object,
+#     whose Cython unpickle helper resolves as `_loss.__pyx_unpickle_
+#     CyHalfMultinomialLoss`. Measured on this project:
+#
+#         joblib written by 1.6.1, loaded by 1.9.0 -&gt; ModuleNotFoundError:
+#             No module named &#x27;_loss&#x27;
+#         joblib written by 1.9.0, loaded by 1.6.1 -&gt; loads, but only with an
+#             InconsistentVersionWarning
+#
+#     The failure is one-directional and silent until it bites. A range pin
+#     lets pip hand you the bad direction.
+#
+#  2. FITTING -- I TESTED THIS AND COULD NOT SHOW INSTABILITY, so I will not
+#     claim it. Same 30k x 12 synthetic fit under 1.6.1 and 1.9.0 returned
+#     bit-identical probabilities: max abs diff 0.0, identical md5, same
+#     n_iter=10, zero argmax mismatches. What that test does NOT cover is scale
+#     -- it was 10 trees on 30k rows, while the deployed model is 89 trees on
+#     8,197,703 rows, and bit-stability has never been checked there. Every
+#     number in PROJECT_STATUS.md, RESULTS.html and ml-training.html was
+#     produced by 1.9.0. Reproduce with 1.9.0 and the question never arises.
+#
+#  Reason (1) alone is sufficient justification for the exact pin. If you must
+#  move versions, retrain from 2_train_split.py onward and replace the numbers;
+#  do not reuse the existing joblib.
+scikit-learn==1.9.0
 
 # --- ONNX export (export_onnx.py) ------------------------------------------
 #
@@ -212,7 +241,7 @@ skl2onnx&gt;=1.16       # converts HistGradientBoostingClassifier -- your model
 # lightgbm&gt;=4.0
 # xgboost&gt;=2.0
 # catboost&gt;=1.2</code></pre>
-<p class="sz">requirements.txt &mdash; 65 lines</p>
+<p class="sz">requirements.txt &mdash; 94 lines</p>
 
 <div class="warn"><p><strong>The <code>protobuf&lt;7</code> pin is a hard
 requirement.</strong> skl2onnx 1.20.0 writes <code>np.uint32</code> into protobuf
@@ -263,10 +292,10 @@ script or an artifact.</p>
 ├── threshold_decision.py      Stage 4  re-price the sweep under a prior
 ├── deploy_model.py            Stage 5  train + freeze the deployable model
 ├── export_onnx.py             Stage 5  convert to ONNX + parity proof
-├── verify_deploy.py           Stage 5  14-check audit of the shipped pair
+├── verify_deploy.py           Stage 5  25-check audit of the shipped pair
 ├── requirements.txt           pinned dependencies
 ├── RUNBOOK.md                 the six deployment commands
-├── PROJECT_STATUS.md          status + 26-entry corrections log
+├── PROJECT_STATUS.md          status + 28-entry corrections log
 ├── merged_data.csv            5.8 GB raw input (not in git)
 ├── test/
 │   └── test_dedup_key.py      unit test for the dedup key
@@ -4008,7 +4037,7 @@ Mixing them up was correction #21.</div><h4>Fixed FPR targets, priced at prior 0
 &tau; to exactly 1.0 and recall to 0.09%, and its cost lands on
 <strong>100</strong> &mdash; precisely the do-nothing baseline
 (<code>prior &times; 1000 &times; cost_fn = 0.001 &times; 1000 &times; 100</code>).
-It is a useful sanity check, not an option.</div><h4>Test transfer <span class="d">(threshold chosen on validation, applied to test)</span></h4><table><thead><tr><th>Target FPR</th><th>&tau;</th><th>Test FPR</th><th>FP</th><th>Flood rec</th><th>Bot rec</th><th>BruteForce rec</th></tr></thead><tbody><tr><td class='name'>0.0100%</td><td>1.00000</td><td>0.0132%</td><td>209</td><td>0.13%</td><td>0.08%</td><td>0.00%</td></tr><tr><td class='name'>0.0300%</td><td>0.99375</td><td>0.0300%</td><td>474</td><td>84.91%</td><td>99.06%</td><td>99.77%</td></tr><tr><td class='name'>0.1000%</td><td>0.98633</td><td>0.1054%</td><td>1,668</td><td>91.80%</td><td>99.06%</td><td>99.77%</td></tr><tr><td class='name'>0.3000%</td><td>0.92144</td><td>0.2949%</td><td>4,665</td><td>97.43%</td><td>99.07%</td><td>99.87%</td></tr><tr><td class='name'>1.0000%</td><td>0.57335</td><td>1.0625%</td><td>16,807</td><td>99.34%</td><td>99.93%</td><td>99.91%</td></tr></tbody></table><h2 id="s5">Part 7 &mdash; Stage 5: Deployment</h2><p class="sub">Train the final model, export to ONNX, and prove the export is faithful.</p><p class="sub d">3 files &middot; 728 lines</p><div class="filebox" id="deploy"><h3>15. &nbsp;deploy_model.py &mdash; train and freeze the deployable model</h3><p class="role">Trains on all 8,197,703 rows at the chosen &tau;, evaluates on the untouched test split, and writes <code>model.joblib</code> plus a <code>model_card.json</code> recording the whole decision.</p><p>The card is the point. It records the feature list and order, the
+It is a useful sanity check, not an option.</div><h4>Test transfer <span class="d">(threshold chosen on validation, applied to test)</span></h4><table><thead><tr><th>Target FPR</th><th>&tau;</th><th>Test FPR</th><th>FP</th><th>Flood rec</th><th>Bot rec</th><th>BruteForce rec</th></tr></thead><tbody><tr><td class='name'>0.0100%</td><td>1.00000</td><td>0.0132%</td><td>209</td><td>0.13%</td><td>0.08%</td><td>0.00%</td></tr><tr><td class='name'>0.0300%</td><td>0.99375</td><td>0.0300%</td><td>474</td><td>84.91%</td><td>99.06%</td><td>99.77%</td></tr><tr><td class='name'>0.1000%</td><td>0.98633</td><td>0.1054%</td><td>1,668</td><td>91.80%</td><td>99.06%</td><td>99.77%</td></tr><tr><td class='name'>0.3000%</td><td>0.92144</td><td>0.2949%</td><td>4,665</td><td>97.43%</td><td>99.07%</td><td>99.87%</td></tr><tr><td class='name'>1.0000%</td><td>0.57335</td><td>1.0625%</td><td>16,807</td><td>99.34%</td><td>99.93%</td><td>99.91%</td></tr></tbody></table><h2 id="s5">Part 7 &mdash; Stage 5: Deployment</h2><p class="sub">Train the final model, export to ONNX, and prove the export is faithful.</p><p class="sub d">3 files &middot; 936 lines</p><div class="filebox" id="deploy"><h3>15. &nbsp;deploy_model.py &mdash; train and freeze the deployable model</h3><p class="role">Trains on all 8,197,703 rows at the chosen &tau;, evaluates on the untouched test split, and writes <code>model.joblib</code> plus a <code>model_card.json</code> recording the whole decision.</p><p>The card is the point. It records the feature list and order, the
 gate rule, the threshold, whether val was folded into training, the deployment
 prior and costs, and the test metrics. Six months later the artifact explains
 itself.</p>
@@ -4374,8 +4403,11 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import datetime
+import hashlib
 import json
 import os
+import platform
 import time
 
 import numpy as np
@@ -4384,6 +4416,120 @@ from common import FEATURES, _XGBFamily  # noqa: F401
 from train_model import load_split
 
 ONNX_OPSET = 15   # onnxmltools&#x27; LightGBM converter caps the AI.onnx.ml opset here
+
+
+def sha256_of(path: str) -&gt; str:
+    &quot;&quot;&quot;Hex sha256 of a file, streamed so a multi-GB artifact would not OOM.&quot;&quot;&quot;
+    h = hashlib.sha256()
+    with open(path, &quot;rb&quot;) as fh:
+        for chunk in iter(lambda: fh.read(1 &lt;&lt; 20), b&quot;&quot;):
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def _ver(mod: str) -&gt; str:
+    &quot;&quot;&quot;Version of an installed package, or &#x27;absent&#x27; -- never raises.
+
+    Uses importlib rather than __import__ because the latter returns the
+    TOP-LEVEL package for a dotted name: __import__(&quot;google.protobuf&quot;) gives you
+    `google`, which has no __version__, so protobuf would read as &quot;unknown&quot;.
+    &quot;&quot;&quot;
+    try:
+        import importlib
+        return getattr(importlib.import_module(mod), &quot;__version__&quot;, &quot;unknown&quot;)
+    except Exception:
+        return &quot;absent&quot;
+
+
+def write_metadata(outdir: str, args, onx, sess, in_name, cols, bi, tau, est,
+                   digest: str, onnx_card: dict) -&gt; str:
+    &quot;&quot;&quot;Write model_metadata.json: everything needed to identify and verify this
+    artifact later, without opening the .onnx or the .joblib.
+
+    Deliberately redundant with onnx_card.json and model_card.json. Those two
+    describe the *contract* and the *decision*; this describes the *artifact* --
+    its hash, its size, the exact package versions that produced it, and when.
+    Redundancy is the point: a registry entry has to stand alone.
+    &quot;&quot;&quot;
+    mp = os.path.join(outdir, &quot;model.onnx&quot;)
+    src = args.model
+    src_digest = sha256_of(src) if os.path.exists(src) else None
+
+    card = {}
+    card_p = os.path.join(outdir, &quot;model_card.json&quot;)
+    if os.path.exists(card_p):
+        try:
+            card = json.load(open(card_p))
+        except Exception:
+            card = {}
+
+    meta = {
+        &quot;schema_version&quot;: 1,
+        &quot;artifact&quot;: {
+            &quot;name&quot;: &quot;flow-detect-hgb-onnx&quot;,
+            &quot;file&quot;: &quot;model.onnx&quot;,
+            &quot;sha256&quot;: digest,
+            &quot;bytes&quot;: os.path.getsize(mp),
+            &quot;onnx_opset&quot;: ONNX_OPSET,
+            &quot;ir_version&quot;: int(getattr(onx, &quot;ir_version&quot;, 0)),
+            &quot;producer&quot;: f&quot;{onx.producer_name} {onx.producer_version}&quot;.strip(),
+            &quot;created_utc&quot;: datetime.datetime.now(datetime.timezone.utc)
+                             .isoformat(timespec=&quot;seconds&quot;),
+        },
+        &quot;source&quot;: {
+            &quot;joblib&quot;: src,
+            &quot;joblib_sha256&quot;: src_digest,
+            &quot;model_kind&quot;: card.get(&quot;model_kind&quot;, type(est).__name__),
+            &quot;n_estimators_declared&quot;: card.get(&quot;n_estimators&quot;),
+            &quot;n_estimators_actual&quot;: int(getattr(est, &quot;n_iter_&quot;, 0)) or None,
+            &quot;seed&quot;: card.get(&quot;seed&quot;),
+            &quot;n_train_rows&quot;: card.get(&quot;n_train_rows&quot;),
+            &quot;fit_seconds&quot;: card.get(&quot;fit_seconds&quot;),
+            &quot;trained_on_val&quot;: card.get(&quot;trained_on_val&quot;),
+            &quot;model_card_sha256&quot;: sha256_of(card_p) if os.path.exists(card_p) else None,
+        },
+        &quot;contract&quot;: {
+            &quot;input_name&quot;: in_name,
+            &quot;input_shape&quot;: [None, len(cols)],
+            &quot;input_dtype&quot;: &quot;float32&quot;,
+            &quot;n_features&quot;: len(cols),
+            &quot;feature_set&quot;: card.get(&quot;feature_set&quot;),
+            &quot;features&quot;: cols,
+            &quot;outputs&quot;: [{&quot;name&quot;: o.name, &quot;shape&quot;: list(o.shape), &quot;type&quot;: o.type}
+                        for o in sess.get_outputs()],
+            &quot;classes&quot;: [str(c) for c in est.classes_],
+            &quot;benign_column_index&quot;: bi,
+            &quot;gate&quot;: {&quot;rule&quot;: &quot;alert when (1 - P(Benign)) &gt;= tau&quot;,
+                     &quot;tau&quot;: tau,
+                     &quot;in_graph&quot;: False,
+                     &quot;note&quot;: &quot;apply downstream; the ONNX graph is probabilities only&quot;},
+        },
+        &quot;parity&quot;: onnx_card[&quot;parity&quot;],
+        &quot;latency_ms&quot;: onnx_card[&quot;latency_ms&quot;],
+        &quot;environment&quot;: {
+            &quot;python&quot;: platform.python_version(),
+            &quot;platform&quot;: platform.platform(),
+            &quot;numpy&quot;: _ver(&quot;numpy&quot;), &quot;sklearn&quot;: _ver(&quot;sklearn&quot;),
+            &quot;onnx&quot;: _ver(&quot;onnx&quot;), &quot;onnxruntime&quot;: _ver(&quot;onnxruntime&quot;),
+            &quot;skl2onnx&quot;: _ver(&quot;skl2onnx&quot;), &quot;onnxmltools&quot;: _ver(&quot;onnxmltools&quot;),
+            &quot;protobuf&quot;: _ver(&quot;google.protobuf&quot;),
+            # pyarrow is what actually reads the split .parquet files, so it
+            # belongs in the record even though it is not on the inference path.
+            &quot;pyarrow&quot;: _ver(&quot;pyarrow&quot;), &quot;pandas&quot;: _ver(&quot;pandas&quot;),
+            # The joblib below is pickle-bound to THIS sklearn. Recorded as a
+            # hard field so a mismatch is obvious before joblib.load is reached.
+            &quot;sklearn_wrote_joblib&quot;: _ver(&quot;sklearn&quot;),
+        },
+        &quot;verify&quot;: {
+            &quot;command&quot;: (&quot;python3 verify_deploy.py --deploy &quot;
+                        f&quot;{outdir} --splits &lt;splits_dir&gt;&quot;),
+            &quot;checksum_command&quot;: f&quot;sha256sum -c {os.path.join(outdir, &#x27;model.onnx.sha256&#x27;)}&quot;,
+        },
+    }
+    p = os.path.join(outdir, &quot;model_metadata.json&quot;)
+    with open(p, &quot;w&quot;) as fh:
+        json.dump(meta, fh, indent=2)
+    return p
 
 
 def to_onnx(est, n_features: int):
@@ -4590,14 +4736,33 @@ def main() -&gt; int:
     cp = os.path.join(args.outdir, &quot;onnx_card.json&quot;)
     with open(cp, &quot;w&quot;) as fh:
         json.dump(onnx_card, fh, indent=2)
+
+    # --- integrity + provenance -------------------------------------------
+    # The .sha256 is written in `sha256sum` format so the standard tooling can
+    # verify it: `sha256sum -c model.onnx.sha256`. Hash the file ON DISK, not
+    # the in-memory proto -- that is the whole point, since it proves what was
+    # actually written rather than what was serialised.
+    digest = sha256_of(op)
+    sp = os.path.join(args.outdir, &quot;model.onnx.sha256&quot;)
+    with open(sp, &quot;w&quot;) as fh:
+        # two spaces = binary mode marker, exactly as sha256sum emits it
+        fh.write(f&quot;{digest}  {os.path.basename(op)}\n&quot;)
+
+    mdp = write_metadata(args.outdir, args, onx, sess, in_name, cols, bi, tau,
+                         est, digest, onnx_card)
+
     print(f&quot;\nwrote {op} ({os.path.getsize(op)/1e6:.1f} MB)&quot;)
     print(f&quot;wrote {cp}&quot;)
+    print(f&quot;wrote {sp}&quot;)
+    print(f&quot;wrote {mdp}&quot;)
+    print(f&quot;\nsha256 {digest}&quot;)
+    print(f&quot;  verify with: (cd {args.outdir} &amp;&amp; sha256sum -c model.onnx.sha256)&quot;)
     return 0
 
 
 if __name__ == &quot;__main__&quot;:
     import sys
-    sys.exit(main())</code></pre><p class="sz">export_onnx.py &mdash; 251 lines, 11,384 bytes</p></div><div class="filebox" id="verifydep"><h3>17. &nbsp;verify_deploy.py &mdash; audit the shipped artifact pair</h3><p class="role">Re-implements inference from scratch, reading the feature order, class order and &tau; from <code>onnx_card.json</code>, then reproduces <code>model_card.json</code> on the full test split.</p><p>Nothing else in the pipeline proves that <code>model.onnx</code> plus
+    sys.exit(main())</code></pre><p class="sz">export_onnx.py &mdash; 387 lines, 17,202 bytes</p></div><div class="filebox" id="verifydep"><h3>17. &nbsp;verify_deploy.py &mdash; audit the shipped artifact pair</h3><p class="role">Re-implements inference from scratch, reading the feature order, class order and &tau; from <code>onnx_card.json</code>, then reproduces <code>model_card.json</code> on the full test split.</p><p>Nothing else in the pipeline proves that <code>model.onnx</code> plus
 <code>onnx_card.json</code>, <em>used the way the service will use them</em>,
 reproduces the metrics you reported. Scoring code that imports the joblib model
 would pass even if the ONNX graph were useless.</p>
@@ -4626,6 +4791,7 @@ joblib model would not catch any of those.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import sys
@@ -4677,6 +4843,77 @@ def main() -&gt; int:
     print(&quot;=&quot; * 72)
     print(f&quot;  onnx    : {onnx_p} ({os.path.getsize(onnx_p) / 1e6:.1f} MB)&quot;)
     print(f&quot;  cards   : {card_p}, {mcard_p}\n&quot;)
+
+    # --------------------------------------------------- artifact integrity
+    # Checks the bytes on disk, not the loaded graph. A model that was
+    # truncated in transfer, edited by hand, or swapped for a different
+    # training run passes every numerical check below while being the wrong
+    # artifact. This is the only check that catches that.
+    print(&quot;--- artifact integrity ---&quot;)
+    meta_p = os.path.join(args.deploy, &quot;model_metadata.json&quot;)
+    sha_p = os.path.join(args.deploy, &quot;model.onnx.sha256&quot;)
+
+    def sha256_of(path: str) -&gt; str:
+        h = hashlib.sha256()
+        with open(path, &quot;rb&quot;) as fh:
+            for chunk in iter(lambda: fh.read(1 &lt;&lt; 20), b&quot;&quot;):
+                h.update(chunk)
+        return h.hexdigest()
+
+    actual = sha256_of(onnx_p)
+    print(f&quot;  model.onnx sha256 : {actual}&quot;)
+
+    have_integrity = os.path.exists(sha_p) or os.path.exists(meta_p)
+    check(have_integrity,
+          &quot;integrity files present (model.onnx.sha256 / model_metadata.json)&quot;
+          + (&quot;&quot; if have_integrity else
+             &quot; -- re-run export_onnx.py to generate them&quot;))
+
+    if os.path.exists(sha_p):
+        want = open(sha_p).read().split()[0].strip().lower()
+        check(want == actual,
+              f&quot;model.onnx matches model.onnx.sha256 ({want[:16]}...)&quot;)
+
+    meta = None
+    if os.path.exists(meta_p):
+        meta = json.load(open(meta_p))
+        a = meta.get(&quot;artifact&quot;, {})
+        check(a.get(&quot;sha256&quot;, &quot;&quot;).lower() == actual,
+              f&quot;model.onnx matches model_metadata.json ({str(a.get(&#x27;sha256&#x27;))[:16]}...)&quot;)
+        check(a.get(&quot;bytes&quot;) == os.path.getsize(onnx_p),
+              f&quot;byte size matches metadata ({a.get(&#x27;bytes&#x27;):,})&quot;)
+        # the metadata also pins the source joblib -- catch a graph exported
+        # from a different training run than the card describes
+        src = (meta.get(&quot;source&quot;) or {}).get(&quot;joblib_sha256&quot;)
+        job = os.path.join(args.deploy, &quot;model.joblib&quot;)
+        if src and os.path.exists(job):
+            check(sha256_of(job) == src,
+                  &quot;model.joblib matches the sha256 recorded at export time&quot;)
+        # cross-check the two cards agree on the gate; they are written by
+        # different scripts and can drift
+        c = meta.get(&quot;contract&quot;, {})
+        check(c.get(&quot;features&quot;) == card[&quot;input&quot;][&quot;features&quot;],
+              &quot;metadata feature order matches onnx_card&quot;)
+        check(abs(float(c.get(&quot;gate&quot;, {}).get(&quot;tau&quot;, 0))
+                  - float(card[&quot;gate&quot;][&quot;tau&quot;])) &lt; 1e-12
+              if c.get(&quot;gate&quot;) else False,
+              &quot;metadata tau matches onnx_card&quot;)
+        check(c.get(&quot;benign_column_index&quot;) == card[&quot;gate&quot;][&quot;benign_column_index&quot;],
+              &quot;metadata benign_column_index matches onnx_card&quot;)
+        # Only the packages needed to RUN inference are required. Optional
+        # converters (onnxmltools for LightGBM/XGBoost) are legitimately absent
+        # on an HGB-only install -- failing on those would be a false alarm.
+        env = meta.get(&quot;environment&quot;, {})
+        ESSENTIAL = (&quot;numpy&quot;, &quot;sklearn&quot;, &quot;onnx&quot;, &quot;onnxruntime&quot;, &quot;protobuf&quot;)
+        absent = [k for k in ESSENTIAL if env.get(k) in (&quot;absent&quot;, None)]
+        check(not absent,
+              &quot;every package required for inference is still importable&quot;
+              + (f&quot; (missing: {&#x27;, &#x27;.join(absent)})&quot; if absent else
+                 f&quot; ({&#x27;, &#x27;.join(f&#x27;{k} {env[k]}&#x27; for k in ESSENTIAL)})&quot;))
+        opt = [f&quot;{k} {v}&quot; for k, v in env.items()
+               if k not in ESSENTIAL and k not in (&quot;python&quot;, &quot;platform&quot;)]
+        print(f&quot;     optional/other: {&#x27;, &#x27;.join(opt) if opt else &#x27;none&#x27;}&quot;)
+    print()
 
     cols = card[&quot;input&quot;][&quot;features&quot;]
     in_name = card[&quot;input&quot;][&quot;name&quot;]
@@ -4782,7 +5019,7 @@ def main() -&gt; int:
 
 
 if __name__ == &quot;__main__&quot;:
-    sys.exit(main())</code></pre><p class="sz">verify_deploy.py &mdash; 178 lines, 7,339 bytes</p></div><h3>Stage 5 results</h3>
+    sys.exit(main())</code></pre><p class="sz">verify_deploy.py &mdash; 250 lines, 10,947 bytes</p></div><h3>Stage 5 results</h3>
 <h4>Deployed model card <span class="d">(model_card.json, verbatim)</span></h4>
 <pre class="c"><code>{
   &quot;artifact_version&quot;: 1,
@@ -5040,8 +5277,63 @@ the model runs at <strong>~1.06 million rows/second</strong>, roughly
 <strong>2,100&times;</strong> inside the 2&nbsp;ms budget. Batch your flows:
 batch 1 is <strong>12&times; worse</strong> than batch 1,000.</p>
 
+<p>Those figures are from one run and they move. A re-export on the same machine
+measured 0.001166&nbsp;ms/row at batch 1,000 &mdash; 0.86&nbsp;million rows/second
+and 1,715&times; inside budget, about 24% slower than the table above. Same model,
+same hardware, different machine load. <strong>The batch-size ranking is stable;
+the absolute numbers are not.</strong> Budget from a measurement taken on the box
+that will actually serve the traffic, and re-take it there.</p>
+
+<h4>Artifact integrity <span class="d">(model.onnx.sha256, model_metadata.json)</span></h4>
+<p>Every file that leaves the pipeline carries a hash, written by
+<code>export_onnx.py</code> and re-checked by <code>verify_deploy.py</code>.</p>
+<table><thead><tr><th>Artifact</th><th>sha256</th><th>Bytes</th></tr></thead><tbody>
+<tr><td class="name"><code>model.onnx</code></td><td style="font-family:ui-monospace,monospace;font-size:11px;word-break:break-all"><code>6170e1a1e6ca495ba785ede7b8b183ab0dc5a468a4aadb210e683f726ed169a6</code></td><td>815,197</td></tr>
+<tr><td class="name"><code>model.joblib</code></td><td style="font-family:ui-monospace,monospace;font-size:11px;word-break:break-all"><code>c5521476bfdb41374360b6e426345c7cef7e103de1e8ad524a2ab64ea2578e78</code></td><td>&mdash;</td></tr>
+<tr><td class="name"><code>model_card.json</code></td><td style="font-family:ui-monospace,monospace;font-size:11px;word-break:break-all"><code>10d8429b169e53a1c761728026420e314078e3fc4a28b380d440482272c3a38b</code></td><td>&mdash;</td></tr>
+</tbody></table>
+<p><strong>The <code>.onnx</code> hash is a reproducibility fingerprint, not just a
+corruption check.</strong> Exporting the same <code>model.joblib</code> twice, in
+separate processes six seconds apart, produced byte-identical files &mdash;
+<code>377d06e4&hellip;</code> both times &mdash; while only <code>created_utc</code>
+in the sidecar JSON differed. No timestamp is baked into the graph. So a re-export
+that returns a <em>different</em> sha256 means the toolchain changed, which is
+exactly the silent drift this project cannot tolerate.</p>
+<p>Note <code>n_estimators_actual 89</code> against
+<code>300</code> declared: early stopping chose that
+many trees, and before this file existed that number was recorded nowhere.</p>
+
+<h4>Environment of record <span class="d">(from model_metadata.json)</span></h4>
+<table><thead><tr><th>Component</th><th>Version</th></tr></thead><tbody>
+<tr><td class='name'>python</td><td>3.12.3</td></tr><tr><td class='name'>platform</td><td>Linux-7.0.0-31-generic-x86_64-with-glibc2.39</td></tr><tr><td class='name'>numpy</td><td>1.26.4</td></tr><tr><td class='name'>sklearn</td><td>1.9.0</td></tr><tr><td class='name'>onnx</td><td>1.22.0</td></tr><tr><td class='name'>onnxruntime</td><td>1.30.0</td></tr><tr><td class='name'>skl2onnx</td><td>1.20.0</td></tr><tr><td class='name'>onnxmltools</td><td>absent</td></tr><tr><td class='name'>protobuf</td><td>6.33.6</td></tr>
+</tbody></table>
+<p class="d"><code>onnxmltools</code> reads <code>absent</code> and that is correct
+&mdash; it is commented out in <code>requirements.txt</code> because HGB exports
+through <code>skl2onnx</code> alone. Only numpy, sklearn, onnx, onnxruntime and
+protobuf are required at inference time.</p>
+<div class="warn"><strong>Why scikit-learn is now pinned exactly.</strong>
+<code>requirements.txt</code> used to say <code>scikit-learn&gt;=1.3</code>, but
+<code>model.joblib</code> is a pickle and pickle records the module path of every
+class it stores. HGB stores its loss object, whose Cython unpickle helper resolves
+as <code>_loss.__pyx_unpickle_CyHalfMultinomialLoss</code>. Measured on this
+project: a joblib written by sklearn 1.6.1 raises
+<code>ModuleNotFoundError: No module named '_loss'</code> when loaded by 1.9.0.
+The reverse direction loads, but only with an
+<code>InconsistentVersionWarning</code>. The failure is one-directional and silent
+until it bites, so a range pin was unsafe. Pinned to
+<code>==1.9.0</code>, taken from the metadata above rather
+than guessed. On the fitting question I tested rather than assumed. The same 30k&nbsp;&times;&nbsp;12
+synthetic fit under sklearn 1.6.1 and 1.9.0 returned <strong>bit-identical
+probabilities</strong> &mdash; max absolute difference 0.0, identical md5, same
+<code>n_iter=10</code>, zero argmax mismatches. So I cannot claim HGB is unstable
+across versions, and I am not claiming it. What that test does not cover is
+scale: it was 10 trees on 30,000 rows, while the deployed model is
+89 trees on 8,197,703 rows, and
+bit-stability has never been checked there. The load failure in reason (1) is
+measured and sufficient on its own; the pin stands on that.</div>
+
 <h4>End-to-end verification <span class="d">(verify_deploy.py)</span></h4>
-<div class="good"><strong>All 14 checks pass with zero delta</strong> on TP, FP,
+<div class="good"><strong>All 25 checks pass with zero delta</strong> on TP, FP,
 FN, FPR, recall, precision, cost and every per-family count, across
 1,755,657 rows.
 <pre class="c"><code>[PASS] feature count agrees across cards (27)
@@ -5098,7 +5390,7 @@ versus &minus;0.0852).</p>
 <tr><td class="name"><strong>test at &tau;</strong></td><td><strong>FPR 0.3073%, recall 97.9261%, cost 5.1437</strong></td><td>model_card.json</td></tr>
 <tr><td class="name">val &rarr; test FPR drift</td><td>0.3024% &rarr; 0.3073% (+1.6% relative)</td><td>computed</td></tr>
 <tr><td class="name">ONNX parity</td><td>0 gate flips on 400,000 rows</td><td>onnx_card.json</td></tr>
-<tr><td class="name">end-to-end audit</td><td>14 / 14 checks pass</td><td>verify_deploy.py</td></tr>
+<tr><td class="name">end-to-end audit</td><td>25 / 25 checks pass</td><td>verify_deploy.py</td></tr>
 </tbody></table>
 <p class="d">The operating point generalises: the false-positive rate moves
 +1.6% from validation to test.</p>
@@ -5285,7 +5577,7 @@ re-run.</div>
 
 <h4>10. Audit the shipped artifact <span class="d">(~1 min)</span></h4>
 <pre class="c"><code>python3 verify_deploy.py --deploy reports/deploy --splits data_out/splits</code></pre>
-<div class="good"><strong>Checkpoint.</strong> All 14 checks must PASS with zero
+<div class="good"><strong>Checkpoint.</strong> All 25 checks must PASS with zero
 delta. Exit code must be 0. This is the last gate before the model is called
 deployed.</div>
 
@@ -5346,7 +5638,7 @@ honesty audit), <code>PROJECT_STATUS.md</code> (status and corrections log),
 <strong>Leakage columns</strong> (<code>Dst Port</code>, <code>Protocol</code>,
 <code>Timestamp</code>, <code>Day/Hour/Minute/Second</code>) are excluded from
 every feature set by design.
-</div></div><script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a39b78ae7f1990d3',t:'MTc4OTE4MDAyOQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();
+</div></div><script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a39be1528fd3fa33',t:'MTc4OTE4NDMxNQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();
 </script>
 </body>
 </html>
