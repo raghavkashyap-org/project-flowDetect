@@ -1,0 +1,80 @@
+{
+  "input": "data_out/filtered_clean.parquet",
+  "total_rows": 11722524,
+  "split": {
+    "train": 0.7,
+    "val": 0.15,
+    "test": 0.15
+  },
+  "split_sizes": {
+    "train": 8197703,
+    "val": 1769164,
+    "test": 1755657
+  },
+  "per_split_class_counts": {
+    "train": {
+      "Benign": 7387271,
+      "DDoS attacks-LOIC-HTTP": 402530,
+      "DDOS attack-HOIC": 139124,
+      "DoS attacks-Hulk": 101677,
+      "Bot": 101313,
+      "SSH-Bruteforce": 65788
+    },
+    "val": {
+      "Benign": 1595604,
+      "DDoS attacks-LOIC-HTTP": 85838,
+      "DDOS attack-HOIC": 29962,
+      "DoS attacks-Hulk": 21992,
+      "Bot": 21594,
+      "SSH-Bruteforce": 14174
+    },
+    "test": {
+      "Benign": 1581874,
+      "DDoS attacks-LOIC-HTTP": 86764,
+      "DDOS attack-HOIC": 29775,
+      "Bot": 21628,
+      "DoS attacks-Hulk": 21530,
+      "SSH-Bruteforce": 14086
+    }
+  },
+  "train_class_weights": {
+    "Benign": 1.1097065479254788,
+    "Bot": 80.91462102592955,
+    "DDOS attack-HOIC": 58.923715534343465,
+    "DDoS attacks-LOIC-HTTP": 20.365446053710283,
+    "DoS attacks-Hulk": 80.62494959528703,
+    "SSH-Bruteforce": 124.6078768164407
+  },
+  "per_split_class_distinct_signatures": {
+    "train": {
+      "Benign": 6643707,
+      "SSH-Bruteforce": 65788,
+      "DoS attacks-Hulk": 101677,
+      "DDoS attacks-LOIC-HTTP": 402529,
+      "DDOS attack-HOIC": 139124,
+      "Bot": 101313
+    },
+    "val": {
+      "Benign": 1424076,
+      "SSH-Bruteforce": 14174,
+      "DoS attacks-Hulk": 21992,
+      "DDoS attacks-LOIC-HTTP": 85838,
+      "DDOS attack-HOIC": 29962,
+      "Bot": 21594
+    },
+    "test": {
+      "Benign": 1424425,
+      "SSH-Bruteforce": 14086,
+      "DoS attacks-Hulk": 21530,
+      "DDoS attacks-LOIC-HTTP": 86764,
+      "DDOS attack-HOIC": 29775,
+      "Bot": 21628
+    }
+  },
+  "classes_absent_from_split": {},
+  "outputs": {
+    "train": "data_out/splits/train.parquet",
+    "val": "data_out/splits/val.parquet",
+    "test": "data_out/splits/test.parquet"
+  }
+}
