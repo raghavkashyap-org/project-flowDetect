@@ -1,0 +1,100 @@
+{
+  "source_model": "reports/deploy/model.joblib",
+  "onnx_opset": 15,
+  "input": {
+    "name": "X",
+    "shape": [
+      null,
+      27
+    ],
+    "dtype": "float32",
+    "features": [
+      "Flow Duration",
+      "Flow Pkts/s",
+      "Flow IAT Mean",
+      "Flow IAT Max",
+      "Flow IAT Std",
+      "Tot Fwd Pkts",
+      "TotLen Fwd Pkts",
+      "Flow Byts/s",
+      "Down/Up Ratio",
+      "Pkt Len Mean",
+      "Pkt Len Std",
+      "Pkt Len Max",
+      "Fwd Pkt Len Max",
+      "Fwd Pkt Len Mean",
+      "Bwd Pkt Len Max",
+      "Bwd Pkt Len Mean",
+      "Fwd Act Data Pkts",
+      "Fwd IAT Std",
+      "Bwd IAT Mean",
+      "Bwd IAT Tot",
+      "SYN Flag Cnt",
+      "RST Flag Cnt",
+      "PSH Flag Cnt",
+      "ACK Flag Cnt",
+      "Fwd PSH Flags",
+      "Idle Mean",
+      "Active Mean"
+    ]
+  },
+  "outputs": [
+    {
+      "name": "label",
+      "shape": [
+        null
+      ],
+      "type": "tensor(string)"
+    },
+    {
+      "name": "probabilities",
+      "shape": [
+        null,
+        4
+      ],
+      "type": "tensor(float)"
+    }
+  ],
+  "gate": {
+    "rule": "alert when (1 - P(Benign)) >= tau",
+    "benign_column_index": 0,
+    "tau": 0.921055988133361,
+    "classes": [
+      "Benign",
+      "Bot",
+      "BruteForce",
+      "Flood"
+    ],
+    "note": "the gate is NOT in the ONNX graph; apply it downstream"
+  },
+  "parity": {
+    "rows_checked": 400000,
+    "max_prob_diff": 0.19065018390175642,
+    "mean_prob_diff": 1.0556057192933548e-06,
+    "rows_gt_1e-6": 15,
+    "rows_gt_1e-3": 12,
+    "label_disagreements": 0,
+    "gate_flips": 0,
+    "worst_case_exposure_rows": 123594,
+    "exposure_note": "rows within max_prob_diff of tau; upper bound on flips for new traffic",
+    "verdict": "identical decisions at tau"
+  },
+  "latency_ms": {
+    "1": {
+      "total_ms": 0.01567228534986498,
+      "per_row_ms": 0.01567228534986498
+    },
+    "64": {
+      "total_ms": 0.12438820192237006,
+      "per_row_ms": 0.0019435656550370322
+    },
+    "1000": {
+      "total_ms": 1.4639644499766291,
+      "per_row_ms": 0.0014639644499766292
+    },
+    "10000": {
+      "total_ms": 15.748793200327782,
+      "per_row_ms": 0.0015748793200327782
+    }
+  }
+}

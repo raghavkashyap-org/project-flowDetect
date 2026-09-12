@@ -1,0 +1,96 @@
+{
+  "artifact_version": 1,
+  "model_kind": "hgb",
+  "n_estimators": 300,
+  "seed": 42,
+  "feature_set": "behavioural",
+  "n_features": 27,
+  "features": [
+    "Flow Duration",
+    "Flow Pkts/s",
+    "Flow IAT Mean",
+    "Flow IAT Max",
+    "Flow IAT Std",
+    "Tot Fwd Pkts",
+    "TotLen Fwd Pkts",
+    "Flow Byts/s",
+    "Down/Up Ratio",
+    "Pkt Len Mean",
+    "Pkt Len Std",
+    "Pkt Len Max",
+    "Fwd Pkt Len Max",
+    "Fwd Pkt Len Mean",
+    "Bwd Pkt Len Max",
+    "Bwd Pkt Len Mean",
+    "Fwd Act Data Pkts",
+    "Fwd IAT Std",
+    "Bwd IAT Mean",
+    "Bwd IAT Tot",
+    "SYN Flag Cnt",
+    "RST Flag Cnt",
+    "PSH Flag Cnt",
+    "ACK Flag Cnt",
+    "Fwd PSH Flags",
+    "Idle Mean",
+    "Active Mean"
+  ],
+  "label_column": "Label",
+  "families": [
+    "Benign",
+    "Flood",
+    "Bot",
+    "BruteForce"
+  ],
+  "gate": "alert when (1 - P(Benign)) >= threshold",
+  "threshold": 0.921055988133361,
+  "threshold_status": "verified on held-out test",
+  "trained_on_val": false,
+  "n_train_rows": 8197703,
+  "fit_seconds": 148.8,
+  "deployment": {
+    "prior": 0.001,
+    "cost_fp": 1.0,
+    "cost_fn": 100.0
+  },
+  "test_metrics": {
+    "threshold": 0.921055988133361,
+    "n_attack": 173783,
+    "n_benign": 1581874,
+    "true_positives": 170179,
+    "false_positives": 4861,
+    "false_negatives": 3604,
+    "fpr": 0.003072937541169524,
+    "recall": 0.9792614927812272,
+    "precision": 0.24184514620316527,
+    "precision_dataset_balance": 0.9722292047531993,
+    "alerts_per_1k": 4.049126096409582,
+    "misses_per_1k": 0.020738507218772795,
+    "cost_per_1k": 5.143715325505634,
+    "per_family": {
+      "Benign": {
+        "n": 1581874,
+        "false_alarms": 4861,
+        "false_alarm_rate": 0.003072937541169524
+      },
+      "Flood": {
+        "n": 138069,
+        "caught": 134680,
+        "recall": 0.9754543018345899,
+        "missed": 3389
+      },
+      "Bot": {
+        "n": 21628,
+        "caught": 21431,
+        "recall": 0.9908914370260773,
+        "missed": 197
+      },
+      "BruteForce": {
+        "n": 14086,
+        "caught": 14068,
+        "recall": 0.998722135453642,
+        "missed": 18
+      }
+    }
+  },
+  "known_limitation": "each attack class appears on a single capture day in CICIDS2017, so cross-session generalisation is untested"
+}

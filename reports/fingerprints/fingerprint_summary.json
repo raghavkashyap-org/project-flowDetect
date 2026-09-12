@@ -1,0 +1,167 @@
+{
+  "rows": 11722524,
+  "classes": [
+    "Benign",
+    "Bot",
+    "DDOS attack-HOIC",
+    "DDoS attacks-LOIC-HTTP",
+    "DoS attacks-Hulk",
+    "SSH-Bruteforce"
+  ],
+  "n_features": 32,
+  "near_constant_pairs": 33,
+  "strong_single_feature_rules": 16,
+  "per_class_near_constant_features": {
+    "Bot": 6,
+    "DDOS attack-HOIC": 5,
+    "DDoS attacks-LOIC-HTTP": 4,
+    "DoS attacks-Hulk": 4,
+    "SSH-Bruteforce": 14
+  },
+  "top_rules": [
+    {
+      "class": "SSH-Bruteforce",
+      "feature": "Init Bwd Win Byts",
+      "modal_value": 230.0,
+      "modal_share": 0.9995853181354202,
+      "benign_share": 0.00025443103286221,
+      "separability": 0.9993309926104932,
+      "n_rows": 94048
+    },
+    {
+      "class": "SSH-Bruteforce",
+      "feature": "Fwd Pkt Len Max",
+      "modal_value": 640.0,
+      "modal_share": 0.9975544402858115,
+      "benign_share": 3.7104525625738954e-05,
+      "separability": 0.9975174265015189,
+      "n_rows": 94048
+    },
+    {
+      "class": "SSH-Bruteforce",
+      "feature": "Bwd Pkt Len Max",
+      "modal_value": 976.0,
+      "modal_share": 0.9975544402858115,
+      "benign_share": 0.0002957003521806339,
+      "separability": 0.9972594630864997,
+      "n_rows": 94048
+    },
+    {
+      "class": "SSH-Bruteforce",
+      "feature": "Init Fwd Win Byts",
+      "modal_value": 26883.0,
+      "modal_share": 0.9976288703640694,
+      "benign_share": 0.00037511539554796805,
+      "separability": 0.9972546444157527,
+      "n_rows": 94048
+    },
+    {
+      "class": "SSH-Bruteforce",
+      "feature": "Pkt Len Max",
+      "modal_value": 976.0,
+      "modal_share": 0.9975544402858115,
+      "benign_share": 0.00033166902498109514,
+      "separability": 0.9972235823772364,
+      "n_rows": 94048
+    },
+    {
+      "class": "SSH-Bruteforce",
+      "feature": "Fwd Act Data Pkts",
+      "modal_value": 16.0,
+      "modal_share": 0.997448111602586,
+      "benign_share": 0.0025613481210012656,
+      "separability": 0.9948932997561364,
+      "n_rows": 94048
+    },
+    {
+      "class": "Bot",
+      "feature": "Pkt Len Max",
+      "modal_value": 326.0,
+      "modal_share": 0.9689556162867126,
+      "benign_share": 6.587946386610794e-05,
+      "separability": 0.9688917820102015,
+      "n_rows": 144535
+    },
+    {
+      "class": "Bot",
+      "feature": "Pkt Len Std",
+      "modal_value": 115.4066568,
+      "modal_share": 0.9614211090739267,
+      "benign_share": 0.0,
+      "separability": 0.9614211090739267,
+      "n_rows": 144535
+    },
+    {
+      "class": "Bot",
+      "feature": "Pkt Len Mean",
+      "modal_value": 56.875,
+      "modal_share": 0.9614211090739267,
+      "benign_share": 1.419816031597154e-06,
+      "separability": 0.9614197440328229,
+      "n_rows": 144535
+    },
+    {
+      "class": "Bot",
+      "feature": "Pkt Size Avg",
+      "modal_value": 65.0,
+      "modal_share": 0.9614211090739267,
+      "benign_share": 0.0006844459816319347,
+      "separability": 0.9607630682591649,
+      "n_rows": 144535
+    },
+    {
+      "class": "Bot",
+      "feature": "Init Bwd Win Byts",
+      "modal_value": 219.0,
+      "modal_share": 0.9538174144670841,
+      "benign_share": 0.0004383445361550946,
+      "separability": 0.9533993138149629,
+      "n_rows": 144535
+    },
+    {
+      "class": "Bot",
+      "feature": "Bwd Pkt Len Max",
+      "modal_value": 112.0,
+      "modal_share": 0.9524820977617878,
+      "benign_share": 0.0016467972878484855,
+      "separability": 0.9509135528264695,
+      "n_rows": 144535
+    },
+    {
+      "class": "Bot",
+      "feature": "Bwd Pkt Len Mean",
+      "modal_value": 32.25,
+      "modal_share": 0.9468156501885356,
+      "benign_share": 1.0411984231712461e-06,
+      "separability": 0.9468146643655736,
+      "n_rows": 144535
+    },
+    {
+      "class": "Bot",
+      "feature": "Fwd Pkt Len Mean",
+      "modal_value": 108.6666667,
+      "modal_share": 0.9409347216937074,
+      "benign_share": 3.786176084259077e-07,
+      "separability": 0.9409343654392535,
+      "n_rows": 144535
+    },
+    {
+      "class": "Bot",
+      "feature": "TotLen Fwd Pkts",
+      "modal_value": 326.0,
+      "modal_share": 0.9409347216937074,
+      "benign_share": 9.862988699494896e-05,
+      "separability": 0.9408419174084371,
+      "n_rows": 144535
+    },
+    {
+      "class": "Bot",
+      "feature": "Fwd Pkt Len Max",
+      "modal_value": 326.0,
+      "modal_share": 0.9409347216937074,
+      "benign_share": 0.00013138031012378996,
+      "separability": 0.940811101398165,
+      "n_rows": 144535
+    }
+  ]
+}

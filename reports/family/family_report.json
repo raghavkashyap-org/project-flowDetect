@@ -1,0 +1,224 @@
+{
+  "family_mapping": {
+    "Benign": "Benign",
+    "DDOS attack-HOIC": "Flood",
+    "DDoS attacks-LOIC-HTTP": "Flood",
+    "DoS attacks-Hulk": "Flood",
+    "Bot": "Bot",
+    "SSH-Bruteforce": "BruteForce"
+  },
+  "family_order": [
+    "Benign",
+    "Flood",
+    "Bot",
+    "BruteForce"
+  ],
+  "tool_group": [
+    "Init Fwd Win Byts",
+    "Init Bwd Win Byts",
+    "Fwd Seg Size Min",
+    "Fwd Header Len",
+    "Pkt Size Avg"
+  ],
+  "family_model": {
+    "all32": {
+      "n_features": 32,
+      "features": [
+        "Flow Duration",
+        "Flow Pkts/s",
+        "Flow IAT Mean",
+        "Flow IAT Max",
+        "Flow IAT Std",
+        "Tot Fwd Pkts",
+        "TotLen Fwd Pkts",
+        "Flow Byts/s",
+        "Down/Up Ratio",
+        "Pkt Len Mean",
+        "Pkt Len Std",
+        "Pkt Len Max",
+        "Pkt Size Avg",
+        "Fwd Pkt Len Max",
+        "Fwd Pkt Len Mean",
+        "Bwd Pkt Len Max",
+        "Bwd Pkt Len Mean",
+        "Fwd Header Len",
+        "Fwd Seg Size Min",
+        "Fwd Act Data Pkts",
+        "Fwd IAT Std",
+        "Bwd IAT Mean",
+        "Bwd IAT Tot",
+        "SYN Flag Cnt",
+        "RST Flag Cnt",
+        "PSH Flag Cnt",
+        "ACK Flag Cnt",
+        "Fwd PSH Flags",
+        "Idle Mean",
+        "Active Mean",
+        "Init Fwd Win Byts",
+        "Init Bwd Win Byts"
+      ],
+      "balanced_accuracy": 0.9995887754576515,
+      "macro_f1": 0.9955997664616438,
+      "accuracy": 0.999345,
+      "benign_fpr": 0.0006985272716688981,
+      "per_class": {
+        "Benign": {
+          "precision": 0.9999722620569904,
+          "recall": 0.9993014727283311,
+          "f1": 0.9996367548622164,
+          "support": 360759
+        },
+        "Flood": {
+          "precision": 0.9967358955486576,
+          "recall": 0.9997753097515568,
+          "f1": 0.9982532891046905,
+          "support": 31154
+        },
+        "Bot": {
+          "precision": 0.9701789264413518,
+          "recall": 0.9995903318312167,
+          "f1": 0.9846650524616626,
+          "support": 4882
+        },
+        "BruteForce": {
+          "precision": 1.0,
+          "recall": 0.9996879875195008,
+          "f1": 0.9998439694180059,
+          "support": 3205
+        }
+      },
+      "confusion_matrix": [
+        [
+          360507,
+          102,
+          150,
+          0
+        ],
+        [
+          7,
+          31147,
+          0,
+          0
+        ],
+        [
+          2,
+          0,
+          4880,
+          0
+        ],
+        [
+          1,
+          0,
+          0,
+          3204
+        ]
+      ]
+    },
+    "behavioural": {
+      "n_features": 27,
+      "features": [
+        "Flow Duration",
+        "Flow Pkts/s",
+        "Flow IAT Mean",
+        "Flow IAT Max",
+        "Flow IAT Std",
+        "Tot Fwd Pkts",
+        "TotLen Fwd Pkts",
+        "Flow Byts/s",
+        "Down/Up Ratio",
+        "Pkt Len Mean",
+        "Pkt Len Std",
+        "Pkt Len Max",
+        "Fwd Pkt Len Max",
+        "Fwd Pkt Len Mean",
+        "Bwd Pkt Len Max",
+        "Bwd Pkt Len Mean",
+        "Fwd Act Data Pkts",
+        "Fwd IAT Std",
+        "Bwd IAT Mean",
+        "Bwd IAT Tot",
+        "SYN Flag Cnt",
+        "RST Flag Cnt",
+        "PSH Flag Cnt",
+        "ACK Flag Cnt",
+        "Fwd PSH Flags",
+        "Idle Mean",
+        "Active Mean"
+      ],
+      "balanced_accuracy": 0.9948892533848364,
+      "macro_f1": 0.9637345125447171,
+      "accuracy": 0.989805,
+      "benign_fpr": 0.010627593490391092,
+      "per_class": {
+        "Benign": {
+          "precision": 0.9994959465703365,
+          "recall": 0.9893724065096089,
+          "f1": 0.9944084116211427,
+          "support": 360759
+        },
+        "Flood": {
+          "precision": 0.9105070970021791,
+          "recall": 0.992456827373692,
+          "f1": 0.9497174100012287,
+          "support": 31154
+        },
+        "Bot": {
+          "precision": 0.8667140572240981,
+          "recall": 0.9989758295780418,
+          "f1": 0.9281568179655534,
+          "support": 4882
+        },
+        "BruteForce": {
+          "precision": 0.9670694864048338,
+          "recall": 0.9987519500780031,
+          "f1": 0.982655410590944,
+          "support": 3205
+        }
+      },
+      "confusion_matrix": [
+        [
+          356925,
+          3036,
+          689,
+          109
+        ],
+        [
+          174,
+          30919,
+          61,
+          0
+        ],
+        [
+          2,
+          3,
+          4877,
+          0
+        ],
+        [
+          4,
+          0,
+          0,
+          3201
+        ]
+      ]
+    }
+  },
+  "pairwise_flood": {
+    "all32": {
+      "pairs": {
+        "DDOS attack-HOIC vs DDoS attacks-LOIC-HTTP": 1.0,
+        "DDOS attack-HOIC vs DoS attacks-Hulk": 1.0,
+        "DDoS attacks-LOIC-HTTP vs DoS attacks-Hulk": 1.0
+      },
+      "mean": 1.0
+    },
+    "behavioural": {
+      "pairs": {
+        "DDOS attack-HOIC vs DDoS attacks-LOIC-HTTP": 0.999333649208177,
+        "DDOS attack-HOIC vs DoS attacks-Hulk": 0.904272191173435,
+        "DDoS attacks-LOIC-HTTP vs DoS attacks-Hulk": 0.998946221677337
+      },
+      "mean": 0.9675173540196497
+    }
+  }
+}

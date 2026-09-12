@@ -1,0 +1,514 @@
+{
+  "model": "hgb",
+  "train_rows": 8197703,
+  "features": [
+    "Flow Duration",
+    "Flow Pkts/s",
+    "Flow IAT Mean",
+    "Flow IAT Max",
+    "Flow IAT Std",
+    "Tot Fwd Pkts",
+    "TotLen Fwd Pkts",
+    "Flow Byts/s",
+    "Down/Up Ratio",
+    "Pkt Len Mean",
+    "Pkt Len Std",
+    "Pkt Len Max",
+    "Pkt Size Avg",
+    "Fwd Pkt Len Max",
+    "Fwd Pkt Len Mean",
+    "Bwd Pkt Len Max",
+    "Bwd Pkt Len Mean",
+    "Fwd Header Len",
+    "Fwd Seg Size Min",
+    "Fwd Act Data Pkts",
+    "Fwd IAT Std",
+    "Bwd IAT Mean",
+    "Bwd IAT Tot",
+    "SYN Flag Cnt",
+    "RST Flag Cnt",
+    "PSH Flag Cnt",
+    "ACK Flag Cnt",
+    "Fwd PSH Flags",
+    "Idle Mean",
+    "Active Mean",
+    "Init Fwd Win Byts",
+    "Init Bwd Win Byts"
+  ],
+  "seed": 42,
+  "class_weight": "balanced",
+  "evaluations": [
+    {
+      "tag": "VAL",
+      "rows": 1769164,
+      "accuracy": 0.9990068755638256,
+      "balanced_accuracy": 0.99966855778433,
+      "macro_f1": 0.993899802832094,
+      "per_class": {
+        "Benign": {
+          "precision": 0.9999843152804302,
+          "recall": 0.9989214115783114,
+          "f1": 0.9994525808336824,
+          "support": 1595604
+        },
+        "Bot": {
+          "precision": 0.9486244176848027,
+          "recall": 0.9995832175604334,
+          "f1": 0.9734373590691802,
+          "support": 21594
+        },
+        "DDOS attack-HOIC": {
+          "precision": 0.9976025572722429,
+          "recall": 0.9999332487817902,
+          "f1": 0.9987665433209988,
+          "support": 29962
+        },
+        "DDoS attacks-LOIC-HTTP": {
+          "precision": 0.9978720930232559,
+          "recall": 0.9997553531070156,
+          "f1": 0.9988128353449179,
+          "support": 85838
+        },
+        "DoS attacks-Hulk": {
+          "precision": 0.9862743339014982,
+          "recall": 0.9998181156784285,
+          "f1": 0.9930000451609989,
+          "support": 21992
+        },
+        "SSH-Bruteforce": {
+          "precision": 0.9998589164785553,
+          "recall": 1.0,
+          "f1": 0.9999294532627866,
+          "support": 14174
+        }
+      },
+      "confusion_matrix": [
+        [
+          1593883,
+          1160,
+          72,
+          182,
+          305,
+          2
+        ],
+        [
+          8,
+          21585,
+          0,
+          0,
+          1,
+          0
+        ],
+        [
+          1,
+          0,
+          29960,
+          1,
+          0,
+          0
+        ],
+        [
+          12,
+          9,
+          0,
+          85817,
+          0,
+          0
+        ],
+        [
+          4,
+          0,
+          0,
+          0,
+          21988,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          14174
+        ]
+      ],
+      "classes": [
+        "Benign",
+        "Bot",
+        "DDOS attack-HOIC",
+        "DDoS attacks-LOIC-HTTP",
+        "DoS attacks-Hulk",
+        "SSH-Bruteforce"
+      ]
+    },
+    {
+      "tag": "TEST",
+      "rows": 1755657,
+      "accuracy": 0.9990556241908299,
+      "balanced_accuracy": 0.9996877416290381,
+      "macro_f1": 0.9941752848868134,
+      "per_class": {
+        "Benign": {
+          "precision": 0.9999848127410977,
+          "recall": 0.998972105237206,
+          "f1": 0.99947820246124,
+          "support": 1581874
+        },
+        "Bot": {
+          "precision": 0.9500791000175778,
+          "recall": 0.9996301091178103,
+          "f1": 0.97422494592646,
+          "support": 21628
+        },
+        "DDOS attack-HOIC": {
+          "precision": 0.9977548421687554,
+          "recall": 1.0,
+          "f1": 0.9988761594847108,
+          "support": 29775
+        },
+        "DDoS attacks-LOIC-HTTP": {
+          "precision": 0.9981933672412603,
+          "recall": 0.999781015167581,
+          "f1": 0.9989865604090611,
+          "support": 86764
+        },
+        "DoS attacks-Hulk": {
+          "precision": 0.9876577196604726,
+          "recall": 0.9998142127264282,
+          "f1": 0.9936987882285054,
+          "support": 21530
+        },
+        "SSH-Bruteforce": {
+          "precision": 0.9996451383960255,
+          "recall": 0.9999290075252023,
+          "f1": 0.9997870528109029,
+          "support": 14086
+        }
+      },
+      "confusion_matrix": [
+        [
+          1580248,
+          1128,
+          67,
+          157,
+          269,
+          5
+        ],
+        [
+          8,
+          21620,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          29775,
+          0,
+          0,
+          0
+        ],
+        [
+          11,
+          8,
+          0,
+          86745,
+          0,
+          0
+        ],
+        [
+          4,
+          0,
+          0,
+          0,
+          21526,
+          0
+        ],
+        [
+          1,
+          0,
+          0,
+          0,
+          0,
+          14085
+        ]
+      ],
+      "classes": [
+        "Benign",
+        "Bot",
+        "DDOS attack-HOIC",
+        "DDoS attacks-LOIC-HTTP",
+        "DoS attacks-Hulk",
+        "SSH-Bruteforce"
+      ]
+    }
+  ],
+  "binary": [
+    {
+      "tag": "VAL (binary)",
+      "rows": 1769164,
+      "accuracy": 0.9994590665421634,
+      "balanced_accuracy": 0.9996718712032246,
+      "macro_f1": 0.9984752301147704,
+      "per_class": {
+        "Attack": {
+          "precision": 0.9945786412218115,
+          "recall": 0.9999366213413229,
+          "f1": 0.9972504345577566,
+          "support": 173560
+        },
+        "Benign": {
+          "precision": 0.9999931020167822,
+          "recall": 0.9994071210651264,
+          "f1": 0.9997000256717842,
+          "support": 1595604
+        }
+      },
+      "confusion_matrix": [
+        [
+          173549,
+          11
+        ],
+        [
+          946,
+          1594658
+        ]
+      ],
+      "classes": [
+        "Attack",
+        "Benign"
+      ]
+    },
+    {
+      "tag": "TEST (binary)",
+      "rows": 1755657,
+      "accuracy": 0.9994486394552011,
+      "balanced_accuracy": 0.9996556177264008,
+      "macro_f1": 0.9984581782801877,
+      "per_class": {
+        "Attack": {
+          "precision": 0.9945455898260656,
+          "recall": 0.9999136854583014,
+          "f1": 0.9972224135160572,
+          "support": 173783
+        },
+        "Benign": {
+          "precision": 0.9999905119498829,
+          "recall": 0.9993975499945001,
+          "f1": 0.9996939430443181,
+          "support": 1581874
+        }
+      },
+      "confusion_matrix": [
+        [
+          173768,
+          15
+        ],
+        [
+          953,
+          1580921
+        ]
+      ],
+      "classes": [
+        "Attack",
+        "Benign"
+      ]
+    }
+  ],
+  "permutation_importance": [
+    {
+      "rank": 1,
+      "feature": "Init Fwd Win Byts",
+      "importance": 0.3584811678575301,
+      "std": 0.0009215856562359876
+    },
+    {
+      "rank": 2,
+      "feature": "Flow IAT Mean",
+      "importance": 0.19042297777662495,
+      "std": 0.004746240456456464
+    },
+    {
+      "rank": 3,
+      "feature": "Fwd Seg Size Min",
+      "importance": 0.18155711356997364,
+      "std": 0.0010380920364208878
+    },
+    {
+      "rank": 4,
+      "feature": "Init Bwd Win Byts",
+      "importance": 0.16702772830215315,
+      "std": 0.0011615819604882975
+    },
+    {
+      "rank": 5,
+      "feature": "Flow IAT Std",
+      "importance": 0.12309321244734102,
+      "std": 0.0008852790289612156
+    },
+    {
+      "rank": 6,
+      "feature": "Fwd Header Len",
+      "importance": 0.1164777434914831,
+      "std": 0.0038089714624729757
+    },
+    {
+      "rank": 7,
+      "feature": "Fwd IAT Std",
+      "importance": 0.10704496623881603,
+      "std": 0.0019350285360911297
+    },
+    {
+      "rank": 8,
+      "feature": "Flow IAT Max",
+      "importance": 0.06414993281614882,
+      "std": 0.0013389808925631682
+    },
+    {
+      "rank": 9,
+      "feature": "Flow Byts/s",
+      "importance": 0.05810189898736703,
+      "std": 0.0011806523662601747
+    },
+    {
+      "rank": 10,
+      "feature": "Flow Duration",
+      "importance": 0.05346245102560976,
+      "std": 0.0004434942193270594
+    },
+    {
+      "rank": 11,
+      "feature": "Pkt Size Avg",
+      "importance": 0.03903497856517335,
+      "std": 0.0019487818889001604
+    },
+    {
+      "rank": 12,
+      "feature": "Fwd Act Data Pkts",
+      "importance": 0.037661335597578595,
+      "std": 0.0018793859523402125
+    },
+    {
+      "rank": 13,
+      "feature": "Pkt Len Mean",
+      "importance": 0.028330614535962972,
+      "std": 0.001896912917166475
+    },
+    {
+      "rank": 14,
+      "feature": "Bwd Pkt Len Max",
+      "importance": 0.025062216790413244,
+      "std": 0.0016834737662773426
+    },
+    {
+      "rank": 15,
+      "feature": "Fwd Pkt Len Max",
+      "importance": 0.02162232930462593,
+      "std": 0.001589538466633978
+    },
+    {
+      "rank": 16,
+      "feature": "Tot Fwd Pkts",
+      "importance": 0.014643008778459329,
+      "std": 0.0005478521332379124
+    },
+    {
+      "rank": 17,
+      "feature": "RST Flag Cnt",
+      "importance": 0.007589078412769605,
+      "std": 0.0003925905429555074
+    },
+    {
+      "rank": 18,
+      "feature": "Active Mean",
+      "importance": 0.007180681441617098,
+      "std": 0.0013938396051687066
+    },
+    {
+      "rank": 19,
+      "feature": "Bwd IAT Mean",
+      "importance": 0.00474623970018447,
+      "std": 0.00038061709774544507
+    },
+    {
+      "rank": 20,
+      "feature": "Bwd IAT Tot",
+      "importance": 0.0035984759752301088,
+      "std": 0.0002605428482916801
+    },
+    {
+      "rank": 21,
+      "feature": "TotLen Fwd Pkts",
+      "importance": 0.0035423219256354535,
+      "std": 4.9469746960350185e-05
+    },
+    {
+      "rank": 22,
+      "feature": "Fwd Pkt Len Mean",
+      "importance": 0.002025981681315255,
+      "std": 0.0009074059328339236
+    },
+    {
+      "rank": 23,
+      "feature": "Pkt Len Std",
+      "importance": 0.0008651779698352439,
+      "std": 0.0002302410736513339
+    },
+    {
+      "rank": 24,
+      "feature": "Flow Pkts/s",
+      "importance": 0.000823239001288556,
+      "std": 0.00010328383710144839
+    },
+    {
+      "rank": 25,
+      "feature": "Idle Mean",
+      "importance": 0.0007537387944916615,
+      "std": 9.105164625430907e-05
+    },
+    {
+      "rank": 26,
+      "feature": "SYN Flag Cnt",
+      "importance": 0.0006407791874920207,
+      "std": 0.000239757618017082
+    },
+    {
+      "rank": 27,
+      "feature": "Pkt Len Max",
+      "importance": 0.0003498740587364324,
+      "std": 0.000126314180276223
+    },
+    {
+      "rank": 28,
+      "feature": "PSH Flag Cnt",
+      "importance": 0.00028350023355931214,
+      "std": 7.627752911170209e-05
+    },
+    {
+      "rank": 29,
+      "feature": "Fwd PSH Flags",
+      "importance": 0.0,
+      "std": 0.0
+    },
+    {
+      "rank": 30,
+      "feature": "ACK Flag Cnt",
+      "importance": -2.4654649989723034e-06,
+      "std": 1.7433470195514003e-06
+    },
+    {
+      "rank": 31,
+      "feature": "Down/Up Ratio",
+      "importance": -9.861859996111258e-06,
+      "std": 4.612462662767024e-06
+    },
+    {
+      "rank": 32,
+      "feature": "Bwd Pkt Len Mean",
+      "importance": -3.205104498734309e-05,
+      "std": 7.599073481933487e-06
+    }
+  ]
+}
