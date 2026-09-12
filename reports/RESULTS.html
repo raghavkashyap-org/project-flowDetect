@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>flow-detect — Results &amp; Honesty Audit</title>
+<style>
+  :root{
+    --bg:#0f1419; --panel:#161c23; --panel2:#1d242d; --line:#2a333d;
+    --fg:#e6edf3; --dim:#8b98a5; --acc:#58a6ff;
+    --good:#3fb950; --warn:#d29922; --bad:#f85149; --pur:#bc8cff;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--fg);
+       font:15px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+  .wrap{max-width:1080px;margin:0 auto;padding:40px 24px 80px}
+  h1{font-size:31px;margin:0 0 6px;letter-spacing:-.5px}
+  h2{font-size:22px;margin:52px 0 14px;padding-bottom:9px;border-bottom:1px solid var(--line)}
+  h3{font-size:16px;margin:30px 0 10px;color:var(--acc);text-transform:uppercase;
+     letter-spacing:.6px;font-weight:600}
+  p{margin:12px 0}
+  .sub{color:var(--dim);font-size:14px;margin:0 0 6px}
+  .meta{color:var(--dim);font-size:13px;margin-top:18px;padding-top:14px;
+        border-top:1px solid var(--line)}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;
+         padding:20px 22px;margin:18px 0}
+  .callout{border-left:4px solid var(--acc);background:var(--panel2);
+           padding:15px 20px;border-radius:0 8px 8px 0;margin:18px 0}
+  .callout.bad{border-left-color:var(--bad)}
+  .callout.warn{border-left-color:var(--warn)}
+  .callout.good{border-left-color:var(--good)}
+  table{width:100%;border-collapse:collapse;margin:16px 0;font-size:13.5px}
+  th,td{text-align:right;padding:9px 11px;border-bottom:1px solid var(--line)}
+  th:first-child,td:first-child{text-align:left}
+  thead th{color:var(--dim);font-weight:600;font-size:11.5px;text-transform:uppercase;
+           letter-spacing:.5px;border-bottom:1px solid #3a4550}
+  tbody tr:hover{background:#1b2229}
+  td.name{font-weight:500}
+  code{background:#222b34;padding:2px 6px;border-radius:4px;font-size:12.5px;
+       font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:#a5d6ff}
+  pre{background:#11161c;border:1px solid var(--line);border-radius:8px;padding:15px;
+      overflow-x:auto;font-size:12.5px;margin:14px 0;
+      font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+  .kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(158px,1fr));gap:13px;margin:20px 0}
+  .kpi div{background:var(--panel);border:1px solid var(--line);border-radius:9px;
+           padding:15px 16px}
+  .kpi .v{font-size:25px;font-weight:600;letter-spacing:-.5px;line-height:1.25}
+  .kpi .l{font-size:11.5px;color:var(--dim);text-transform:uppercase;letter-spacing:.5px;
+          margin-top:5px}
+  .g{color:var(--good)} .w{color:var(--warn)} .b{color:var(--bad)} .p{color:var(--pur)}
+  .d{color:var(--dim)}
+  ul,ol{margin:12px 0;padding-left:24px} li{margin:7px 0}
+  .tag{display:inline-block;font-size:11px;padding:2px 8px;border-radius:20px;
+       background:#232c36;color:var(--dim);margin-left:6px;vertical-align:middle}
+  .tag.ok{background:#12331c;color:#5dd47a}
+  .tag.no{background:#3a1a18;color:#ff8177}
+  .tag.mid{background:#3a2e10;color:#e5bd4e}
+  hr{border:0;border-top:1px solid var(--line);margin:36px 0}
+  .foot{color:var(--dim);font-size:12.5px;margin-top:44px;padding-top:18px;
+        border-top:1px solid var(--line)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>flow-detect — Results &amp; Honesty Audit</h1>
+<p class="sub">CICIDS2017 Friday · clean → split → train → validate → deploy</p>
+<p class="sub">Downstream of <em>DATASET-pre-training audit</em> (16,137,183 rows / 83 cols)</p>
+
+<div class="callout bad">
+<strong>Read this first.</strong> A 6-class model reaches <strong>99.97% balanced accuracy</strong>.
+That number is <strong>largely an artifact</strong>: removing five per-tool TCP-stack columns costs
+<strong>8.5 macro-F1 points</strong> and raises the false-positive rate <strong>26×</strong>.
+The deployed model uses the <strong>27-feature behavioural set</strong>.
+</div>
+
+<div class="callout good">
+<strong>Deployed and verified.</strong> HistGradientBoosting on all
+<strong>8,197,703</strong> training rows, gate at <strong>τ = 0.921056</strong>, exported to ONNX.
+On the full <strong>1,755,657-row</strong> test split:
+<strong>recall 97.93%</strong>, benign FPR <strong>0.307%</strong>,
+<strong>24.18% precision at a 1-in-1,000 attack prior</strong>,
+cost <strong>5.14 per 1,000 flows</strong> against a do-nothing baseline of 100.
+<br><br>
+The ONNX export reproduces the native model exactly at the operating threshold —
+<strong>0 gate flips</strong> on 400,000 rows — and a 14-check end-to-end audit
+(<code>verify_deploy.py</code>) reproduces every metric in the model card with zero delta.
+</div>
+
+<h2>1. Pipeline lineage</h2>
+<table>
+<thead><tr><th>Stage</th><th>Script</th><th>Output</th><th>Status</th></tr></thead>
+<tbody>
+<tr><td class="name">Audit</td><td><code>DATASET-pre-training audit.html</code></td><td>16.14M × 83</td><td><span class="tag ok">done</span></td></tr>
+<tr><td class="name">Filter + clean</td><td><code>1_filter_clean.py</code></td><td>11,722,524 × 33</td><td><span class="tag ok">done</span></td></tr>
+<tr><td class="name">Verify</td><td><code>3_verify.py</code></td><td>TRAIN-READY</td><td><span class="tag ok">done</span></td></tr>
+<tr><td class="name">Split</td><td><code>2_train_split.py</code></td><td>8.20M / 1.77M / 1.76M</td><td><span class="tag ok">done</span></td></tr>
+<tr><td class="name">Baseline</td><td><code>train_model.py</code></td><td>6-class + binary</td><td><span class="tag ok">done</span></td></tr>
+<tr><td class="name">Ablation</td><td><code>ablate.py</code></td><td>4 feature sets</td><td><span class="tag ok">done</span></td></tr>
+<tr><td class="name">Fingerprints</td><td><code>fingerprints.py</code></td><td>192 (class,feature) pairs</td><td><span class="tag ok">done</span></td></tr>
+<tr><td class="name">Family + separability</td><td><code>train_family.py</code></td><td>4 families, 3 pairwise tests</td><td><span class="tag ok">done</span></td></tr>
+<tr><td class="name">Model comparison</td><td><code>compare_models.py</code></td><td>8 candidates + McNemar</td><td><span class="tag ok">done</span></td></tr>
+<tr><td class="name">Threshold</td><td><code>tune_threshold.py</code>, <code>threshold_decision.py</code></td><td>1,769,164 thresholds, EXACT</td><td><span class="tag ok">done</span></td></tr>
+<tr><td class="name">Deploy</td><td><code>deploy_model.py</code>, <code>export_onnx.py</code></td><td>model.joblib → model.onnx</td><td><span class="tag ok">done</span></td></tr>
+<tr><td class="name">Verify</td><td><code>verify_deploy.py</code></td><td>14 checks</td><td><span class="tag ok">all pass</span></td></tr>
+</tbody></table>
+
+<h2>2. The cleaned dataset</h2>
+<div class="kpi">
+  <div><div class="v">11,722,524</div><div class="l">rows kept</div></div>
+  <div><div class="v">72.6%</div><div class="l">of raw retained</div></div>
+  <div><div class="v">32</div><div class="l">features</div></div>
+  <div><div class="v">6</div><div class="l">classes</div></div>
+</div>
+<table>
+<thead><tr><th>Class</th><th>Rows</th><th>Distinct</th><th>Collapse</th><th>Share</th></tr></thead>
+<tbody>
+<tr><td class="name">Benign</td><td>10,564,749</td><td>9,492,208</td><td class="w">1.11×</td><td>90.12%</td></tr>
+<tr><td class="name">DDoS attacks-LOIC-HTTP</td><td>575,132</td><td>575,131</td><td>1.00×</td><td>4.91%</td></tr>
+<tr><td class="name">DDOS attack-HOIC</td><td>198,861</td><td>198,861</td><td>1.00×</td><td>1.70%</td></tr>
+<tr><td class="name">DoS attacks-Hulk</td><td>145,199</td><td>145,199</td><td>1.00×</td><td>1.24%</td></tr>
+<tr><td class="name">Bot</td><td>144,535</td><td>144,535</td><td>1.00×</td><td>1.23%</td></tr>
+<tr><td class="name">SSH-Bruteforce</td><td>94,048</td><td>94,048</td><td>1.00×</td><td>0.80%</td></tr>
+</tbody></table>
+
+<h3>Drops</h3>
+<table>
+<thead><tr><th>Reason</th><th>Rows</th></tr></thead>
+<tbody>
+<tr><td class="name">Label not in the selected set</td><td>549,039</td></tr>
+<tr><td class="name">Exact duplicate rows (78-col key)</td><td>3,865,366</td></tr>
+<tr><td class="name">Corrupt negatives (int16 overflow / clock jump)</td><td>254</td></tr>
+<tr><td class="name">NaN / ±inf</td><td>0</td></tr>
+</tbody></table>
+
+<div class="callout warn">
+<strong>FTP-BruteForce was excluded.</strong> Its 193,354 rows contain only
+<strong>53 distinct</strong> feature-signatures — 45.1% of the class is a single row repeated
+87,297×. It cannot be trained or evaluated. SSH-Bruteforce (94,048 distinct) is the
+brute-force representative.
+</div>
+
+<h2>3. Honesty audit</h2>
+<p>Three independent tests were run. All three point the same way.</p>
+
+<h3>3.1 Feature ablation — what are the fingerprints worth?</h3>
+<p>Same model, nested feature sets. 5 columns form the per-tool TCP-stack template group:
+<code>Init Fwd Win Byts</code>, <code>Init Bwd Win Byts</code>, <code>Fwd Seg Size Min</code>,
+<code>Fwd Header Len</code>, <code>Pkt Size Avg</code>.</p>
+<table>
+<thead><tr><th>Variant</th><th>Feats</th><th>Bal. acc</th><th>Macro F1</th><th>Benign FPR</th><th>Worst class</th></tr></thead>
+<tbody>
+<tr><td class="name">all32</td><td>32</td><td>0.999586</td><td>0.996575</td><td class="g">0.065%</td><td>HOIC 0.981</td></tr>
+<tr><td class="name">no_initwin</td><td>30</td><td>0.994919</td><td>0.956869</td><td class="w">1.417%</td><td>HOIC 0.795</td></tr>
+<tr><td class="name">behavioural</td><td>27</td><td>0.963185</td><td class="b">0.911366</td><td class="b">1.714%</td><td>Hulk 0.595</td></tr>
+<tr><td class="name">handshake_timing</td><td>14</td><td>0.960950</td><td class="b">0.895221</td><td class="b">2.098%</td><td>Hulk 0.518</td></tr>
+</tbody></table>
+<p><span class="d">Delta vs all32 —</span> macro F1 <span class="b">−0.085209</span>,
+FPR <span class="b">×26</span>. Balanced accuracy alone (−0.036) understates this: it is mean recall
+only, and hides precision collapse.</p>
+
+<h3>3.2 Fingerprint detector</h3>
+<div class="kpi">
+  <div><div class="v b">33</div><div class="l">near-constant (class,feature) pairs</div></div>
+  <div><div class="v b">16</div><div class="l">single-feature rules</div></div>
+  <div><div class="v w">14<span class="d">/32</span></div><div class="l">SSH constant features</div></div>
+  <div><div class="v">0</div><div class="l">globally dead features</div></div>
+</div>
+<table>
+<thead><tr><th>Class</th><th>Near-constant / 32</th><th>Strongest single-feature rule</th><th>In class</th><th>In benign</th></tr></thead>
+<tbody>
+<tr><td class="name">SSH-Bruteforce</td><td class="b">14</td><td><code>Init Bwd Win Byts == 230</code></td><td>99.96%</td><td class="g">0.025%</td></tr>
+<tr><td class="name">Bot</td><td class="w">6</td><td><code>Pkt Len Mean == 56.875</code></td><td>96.14%</td><td class="g">0.000%</td></tr>
+<tr><td class="name">DDOS attack-HOIC</td><td class="w">5</td><td><code>Bwd Pkt Len Mean == 233.75</code></td><td>82.34%</td><td class="g">0.000%</td></tr>
+<tr><td class="name">DoS attacks-Hulk</td><td>4</td><td><code>Fwd Seg Size Min == 32</code></td><td>99.13%</td><td class="w">4.541%</td></tr>
+<tr><td class="name">DDoS attacks-LOIC-HTTP</td><td>4</td><td><code>Fwd Pkt Len Mean == 6.667</code></td><td>50.30%</td><td class="g">0.000%</td></tr>
+</tbody></table>
+<p><span class="d">Reading —</span> SSH-Bruteforce is identified by
+<code>Init Fwd Win Byts == 26883</code> (99.76% of class, 0.038% of benign) and
+<code>Pkt Len Max == 976</code>. These are SSH client defaults, not attack behaviour.
+Its 0.9998 F1 was never detection.</p>
+
+<h3>3.3 Family model &amp; flood separability</h3>
+<p>6 classes regrouped to <code>Benign / Flood / Bot / BruteForce</code>
+(Flood = HOIC + LOIC-HTTP + Hulk).</p>
+<table>
+<thead><tr><th>Variant</th><th>Feats</th><th>Bal. acc</th><th>Macro F1</th><th>Benign FPR</th></tr></thead>
+<tbody>
+<tr><td class="name">family all32</td><td>32</td><td>0.999589</td><td>0.995600</td><td class="g">0.0699%</td></tr>
+<tr><td class="name">family behavioural</td><td>27</td><td class="g">0.994889</td><td class="g">0.963735</td><td class="w">1.0628%</td></tr>
+</tbody></table>
+
+<h3>Pairwise flood separability <span class="d">(0.50 = same class, 1.00 = separable)</span></h3>
+<table>
+<thead><tr><th>Pair</th><th>all32</th><th>behavioural</th><th>Verdict</th></tr></thead>
+<tbody>
+<tr><td class="name">HOIC vs LOIC-HTTP</td><td>1.0000</td><td>0.9993</td><td><span class="tag ok">separable</span></td></tr>
+<tr><td class="name">HOIC vs Hulk</td><td>1.0000</td><td class="w">0.9043</td><td><span class="tag mid">weakest link</span></td></tr>
+<tr><td class="name">LOIC-HTTP vs Hulk</td><td>1.0000</td><td>0.9989</td><td><span class="tag ok">separable</span></td></tr>
+</tbody></table>
+<p><span class="d">This predicts the deployed model's error structure exactly — see §5:
+<strong>94.0% of all misses are Flood.</strong></span></p>
+
+<h2>4. Model selection</h2>
+<p>Eight candidates at the same operating point, priced under prior 0.001 and
+miss = 100× false alarm. Train rows noted where reduced.</p>
+<table>
+<thead><tr><th>Model</th><th>Train</th><th>Val recall</th><th>Test recall</th><th>Test FN</th><th>Cost/1k</th><th>Fit (s)</th></tr></thead>
+<tbody>
+<tr><td class="name">XGBoost</td><td>2M</td><td>0.9777</td><td class="g">0.9804</td><td class="g">775</td><td class="g">4.94</td><td>212.4</td></tr>
+<tr><td class="name"><strong>HGB (deployed)</strong></td><td>2M</td><td>0.9770</td><td>0.9801</td><td>789</td><td>4.97</td><td class="g">29.1</td></tr>
+<tr><td class="name">HGB deep</td><td>2M</td><td>0.9773</td><td>0.9796</td><td>806</td><td>5.02</td><td>54.1</td></tr>
+<tr><td class="name">LightGBM</td><td>2M</td><td>0.9769</td><td>0.9794</td><td>816</td><td>5.04</td><td>264.2</td></tr>
+<tr><td class="name">CatBoost</td><td>2M</td><td>0.9743</td><td>0.9769</td><td>913</td><td>5.29</td><td>185.5</td></tr>
+<tr><td class="name">ExtraTrees</td><td>1M</td><td>0.9752</td><td>0.9782</td><td>862</td><td>5.16</td><td>73.3</td></tr>
+<tr><td class="name">RandomForest</td><td>1M</td><td>0.9744</td><td>0.9775</td><td>890</td><td>5.23</td><td>133.9</td></tr>
+<tr><td class="name">LogReg <span class="d">(reference)</span></td><td>2M</td><td class="b">0.6516</td><td class="b">0.6539</td><td class="b">13,703</td><td class="b">37.59</td><td>104.4</td></tr>
+</tbody></table>
+
+<div class="callout">
+<strong>McNemar exact test, XGBoost vs HGB: b = 32, c = 24, p = 0.3497 — not significant.</strong>
+The five 2M-row tree models span <strong>0.0035 recall = 139 attacks</strong>. XGBoost is
+numerically ahead but the difference is inside noise, and HGB fits
+<strong>7.3× faster</strong>. Decision: <strong>keep HGB.</strong>
+<br><br>
+<span class="d">Recorded caveat: this comparison's "HGB (current)" was trained before the
+<code>HGB_PARAMS</code> unification, so it was a near-twin of the incumbent rather than the
+incumbent. The spread is inside noise either way, so the verdict stands.</span>
+</div>
+
+<h2>5. Deployed operating point</h2>
+<p>An IDS decision is two steps: <strong>gate</strong> (alert at all?
+<code>score = 1 − P(Benign) ≥ τ</code>) then <strong>label</strong> (which family?).
+Every candidate threshold — one per validation row, <strong>1,769,164</strong> of them —
+is evaluated exactly by sort + cumulative sum and written to
+<code>threshold_sweep.npz</code>. The threshold is chosen on validation and
+reported on the untouched test split.</p>
+
+<h3>Threshold sweep <span class="d">(validation, 1,769,164 rows)</span></h3>
+<table>
+<thead><tr><th>Operating point</th><th>τ</th><th>FPR</th><th>Recall</th><th>Prec @ prior</th><th>Cost/1k</th><th>vs opt</th></tr></thead>
+<tbody>
+<tr><td class="name">untuned argmax</td><td>—</td><td>1.0588%</td><td class="g">99.5322%</td><td>—</td><td>—</td><td>—</td></tr>
+<tr><td class="name"><strong>cost-optimal</strong></td><td><strong>0.921056</strong></td><td><strong>0.3024%</strong></td><td><strong>97.8561%</strong></td><td><strong>24.47%</strong></td><td class="g"><strong>5.16</strong></td><td>1.0×</td></tr>
+<tr><td class="name">target FPR 0.03%</td><td>0.99375</td><td>0.0300%</td><td>87.80%</td><td>74.58%</td><td>12.50</td><td>2.4×</td></tr>
+<tr><td class="name">target FPR 0.1%</td><td>0.98633</td><td>0.1000%</td><td>93.18%</td><td>48.27%</td><td>7.82</td><td>1.5×</td></tr>
+<tr><td class="name">target FPR 0.3%</td><td>0.92144</td><td>0.2999%</td><td>97.77%</td><td>24.60%</td><td>5.22</td><td>1.0×</td></tr>
+<tr><td class="name">target FPR 1.0%</td><td>0.57335</td><td>1.0000%</td><td>99.53%</td><td>9.06%</td><td>10.46</td><td>2.0×</td></tr>
+<tr><td class="name">target FPR 0.01%</td><td class="b">1.00000</td><td>0.0100%</td><td class="b">0.09%</td><td>0.91%</td><td class="b">100</td><td class="b">19.4×</td></tr>
+</tbody></table>
+
+<div class="callout warn">
+<strong>The 0.01% FPR target is degenerate.</strong> It drives τ to 1.0 and recall to
+0.09%, and its cost lands on exactly <strong>100</strong> — which is the
+<em>do-nothing</em> baseline (<code>prior × 1000 × cost_fn</code>). That row is a useful
+sanity check, not an option: a 0.01% false-alarm rate is unreachable together with
+usable recall on this data.
+</div>
+
+<h3>Deployed model on the full test split <span class="d">(1,755,657 rows, τ = 0.921056)</span></h3>
+<div class="kpi">
+  <div><div class="v g">97.926%</div><div class="l">attack recall</div></div>
+  <div><div class="v g">0.307%</div><div class="l">benign FPR</div></div>
+  <div><div class="v">24.18%</div><div class="l">precision @ prior 0.001</div></div>
+  <div><div class="v g">5.14</div><div class="l">cost per 1,000 flows</div></div>
+</div>
+<pre>TP / FP / FN   : 170,179 / 4,861 / 3,604
+FPR            : 0.307294%        (4,861 of 1,581,874 benign)
+recall         : 97.926149%       (170,179 of 173,783 attacks)
+precision      : 24.184515%       at prior 0.001
+workload       : 4.05 alerts and 0.0207 misses per 1,000 flows
+cost           : 5.1437 per 1,000 flows   (do-nothing baseline: 100)
+train          : 8,197,703 rows   ·   fit 148.8 s   ·   deterministic</pre>
+<table>
+<thead><tr><th>Family</th><th>Support</th><th>Caught</th><th>Recall</th><th>Missed</th><th>Share of misses</th></tr></thead>
+<tbody>
+<tr><td class="name">Flood</td><td>138,069</td><td>134,680</td><td class="w">97.5454%</td><td class="b">3,389</td><td class="b">94.03%</td></tr>
+<tr><td class="name">Bot</td><td>21,628</td><td>21,431</td><td class="g">99.0891%</td><td>197</td><td>5.47%</td></tr>
+<tr><td class="name">BruteForce</td><td>14,086</td><td>14,068</td><td class="g">99.8722%</td><td>18</td><td>0.50%</td></tr>
+<tr><td class="name">Benign</td><td>1,581,874</td><td colspan="3">4,861 false alarms (0.3073%)</td><td>—</td></tr>
+</tbody></table>
+
+<div class="callout">
+<strong>The gate converts the model into a conservative flood detector.</strong>
+94.0% of everything surrendered is Flood — the same weak link the pairwise audit
+found (HOIC vs Hulk, separability 0.9043). Bot and BruteForce hold at 99.09% and
+99.87%. This is a data limitation, not a tuning failure.
+</div>
+
+<div class="callout bad">
+<strong>Do not quote 97.22% precision.</strong> That is precision at the
+<em>dataset's</em> 9.90% attack balance. At your deployment prior of 1-in-1,000 the
+operator really sees <strong>24.18%</strong> — roughly 3 false alarms per true
+detection. A reporting bug here overstated it <strong>4.02×</strong> and was caught
+before shipping; see the corrections log.
+</div>
+
+<h3>The 8.2M retrain bought 1.71%</h3>
+<table>
+<thead><tr><th>Metric (val, cost-optimal)</th><th>2M rows</th><th>8.2M rows</th><th>Change</th></tr></thead>
+<tbody>
+<tr><td class="name">τ</td><td>0.92419</td><td>0.921056</td><td>−0.0031</td></tr>
+<tr><td class="name">FPR</td><td>0.2985%</td><td>0.3024%</td><td>+0.0039</td></tr>
+<tr><td class="name">Recall</td><td>97.73%</td><td>97.8561%</td><td>+0.126</td></tr>
+<tr><td class="name">Cost/1k</td><td>5.25</td><td class="g">5.16</td><td class="g">−1.71%</td></tr>
+<tr><td class="name">Untuned FPR</td><td>1.0628%</td><td>1.0588%</td><td>−0.004</td></tr>
+<tr><td class="name">Untuned recall</td><td>99.5413%</td><td>99.5322%</td><td>−0.009</td></tr>
+</tbody></table>
+<p><span class="d">The untuned reference barely moved — the model was
+<strong>already saturated at 2M rows</strong>. This validates the earlier results rather
+than improving them.</span></p>
+
+<h3>Break-even — when detection stops paying</h3>
+<p>Solving <code>do-nothing cost = detector cost</code> at the deployed recall and FPR:</p>
+<div class="kpi">
+  <div><div class="v p">3.14e-05</div><div class="l">break-even attack prior</div></div>
+  <div><div class="v p">1 in 31,868</div><div class="l">flows</div></div>
+  <div><div class="v g">32×</div><div class="l">your margin above it</div></div>
+</div>
+<table>
+<thead><tr><th>Prior</th><th>Do nothing</th><th>Detector</th><th>Verdict</th></tr></thead>
+<tbody>
+<tr><td class="name">1e-03 <span class="d">(yours)</span></td><td>100.000</td><td class="g">5.144</td><td><span class="tag ok">detect</span></td></tr>
+<tr><td class="name">3.14e-05</td><td>3.138</td><td>3.138</td><td><span class="tag mid">break-even</span></td></tr>
+<tr><td class="name">1e-05</td><td class="g">1.000</td><td>3.094</td><td><span class="tag no">ignore</span></td></tr>
+</tbody></table>
+
+<h2>6. ONNX export</h2>
+<pre>model.onnx   0.8 MB · opset 15
+input        X [None, 27] float32
+outputs      label [None] tensor(string) · probabilities [None, 4] tensor(float)
+classes      [Benign, Bot, BruteForce, Flood]   ← alphabetical; benign column 0
+gate         NOT in the graph — score = 1 − P(Benign) ≥ 0.921055988133361</pre>
+
+<h3>Parity — native float64 vs ONNX float32 <span class="d">(400,000 test rows)</span></h3>
+<table>
+<thead><tr><th>Metric</th><th>Value</th><th>Reading</th></tr></thead>
+<tbody>
+<tr><td class="name">max prob diff</td><td class="w">1.907e-01</td><td>float32 rounding — see note</td></tr>
+<tr><td class="name">mean prob diff</td><td>1.056e-06</td><td>negligible</td></tr>
+<tr><td class="name">rows &gt; 1e-6</td><td>15 (0.004%)</td><td></td></tr>
+<tr><td class="name">rows &gt; 1e-3</td><td>12</td><td></td></tr>
+<tr><td class="name">label disagreements</td><td class="g">0</td><td></td></tr>
+<tr><td class="name"><strong>gate flips at τ</strong></td><td class="g"><strong>0</strong></td><td><strong>the number that matters</strong></td></tr>
+<tr><td class="name">worst-case exposure</td><td class="w">123,594</td><td>upper bound, pessimistic</td></tr>
+</tbody></table>
+
+<div class="callout warn">
+<strong>The 0.19 max diff is float32 rounding, not a defect — but the margin is not free.</strong>
+ONNX runs the trees in float32 (~7 significant digits). CICIDS features such as
+<code>Flow Byts/s</code> and <code>Bwd IAT Tot</code> reach 1e9–1e10, where adjacent
+float32 values are thousands apart. Reproduced deliberately: small-valued fixtures
+give <strong>1.9e-07</strong>; CICIDS-magnitude fixtures give <strong>0.94</strong>.
+<br><br>
+Decisions on the checked rows are unchanged. But a synthetic draw from the same
+recipe produced <strong>7 gate flips in 30,000 rows</strong>, so this is a tail risk,
+not a guarantee. <strong>Mitigation:</strong> in the Alert Router, re-score any flow
+whose score lands within ~0.01 of τ through the native joblib model.
+</div>
+
+<h3>Latency <span class="d">(onnxruntime, CPU)</span></h3>
+<table>
+<thead><tr><th>Batch</th><th>Total</th><th>Per row</th><th>Throughput</th></tr></thead>
+<tbody>
+<tr><td class="name">1</td><td>0.012 ms</td><td>0.01164 ms</td><td>86k rows/s</td></tr>
+<tr><td class="name">64</td><td>0.077 ms</td><td>0.00121 ms</td><td>826k rows/s</td></tr>
+<tr><td class="name"><strong>1,000</strong></td><td>0.942 ms</td><td class="g"><strong>0.00094 ms</strong></td><td class="g"><strong>1.06M rows/s</strong></td></tr>
+<tr><td class="name">10,000</td><td>11.44 ms</td><td>0.00114 ms</td><td>874k rows/s</td></tr>
+</tbody></table>
+<p><span class="d">Native <code>predict_proba</code> took 1475.5 ms for 400,000 rows vs
+840.4 ms for ONNX — <strong>1.76×</strong>. Against the architecture's 2 ms budget the
+best batch size has <strong>2,128× headroom</strong>. Batch your flows: batch 1 is
+<strong>12× worse</strong> than batch 1,000.</span></p>
+
+<h3>End-to-end verification</h3>
+<p><code>verify_deploy.py</code> re-implements inference from scratch, reading feature
+order, class order and τ <strong>from <code>onnx_card.json</code></strong> rather than from
+the Python model, then scores the full test split and compares against
+<code>model_card.json</code>.</p>
+<div class="callout good">
+<strong>All 14 checks pass with zero delta</strong> on TP, FP, FN, FPR, recall,
+precision, cost and every per-family count, across 1,755,657 rows.
+<br><br>
+<span class="d">Confirmed the check can fail: permuting the feature order, setting the
+wrong benign column index, and reverting τ to the old 0.92419 each produce FAIL and
+exit code 1. A permuted feature order otherwise yields confident garbage with no
+error anywhere.</span>
+</div>
+
+<h2>7. What to report</h2>
+<div class="callout good">
+<strong>Primary result:</strong> 4-family behavioural IDS on 27 template-free features,
+trained on 8,197,703 flows. At the deployed operating point
+(τ = 0.921056, prior 1-in-1,000, miss = 100× false alarm):
+<strong>97.93% attack recall</strong>, <strong>0.307% benign FPR</strong>,
+<strong>24.18% precision</strong>, <strong>5.14 cost per 1,000 flows</strong> against a
+do-nothing baseline of 100.
+<br><br>
+<strong>State explicitly:</strong> 6-class accuracy is 99.97%, but 8.5 macro-F1 points of that
+come from five per-tool TCP-stack columns. The 6-class figure is the
+<span class="d">fingerprint-dependent upper bound</span>, not detection performance.
+<br><br>
+<strong>State the weakness:</strong> 94.0% of misses are Flood, tracing to HOIC-vs-Hulk
+separability of 0.9043 once tool fingerprints are removed.
+</div>
+
+<h2>8. Limitations</h2>
+<ol>
+<li><strong>No cross-session evaluation is possible.</strong> Every attack class occurs on exactly
+one capture day (HOIC d21, LOIC-HTTP d20, Hulk d16, Bot d2, SSH d14), so leave-one-day-out
+removes the class from training entirely. CICIDS2017 cannot test generalisation to an
+unseen capture.</li>
+<li><strong>Random split shares bursts.</strong> Attacks are single-hour bursts; a 70/15/15
+content split still puts near-identical rows on both sides. Even 0.9793 recall is an
+optimistic reading of field performance.</li>
+<li><strong>Flood dominates the residual error</strong> — 3,389 of 3,604 misses (94.03%).</li>
+<li><strong>Precision is prior-dependent and low.</strong> 24.18% at 1-in-1,000 means roughly
+3 false alarms per true detection. This is inherent to the prior, not a defect — but it
+must be stated, and the dataset's own 9.90% balance must never be quoted instead.</li>
+<li><strong>The ONNX export is not bit-exact.</strong> 0 gate flips on 400,000 rows, but
+float32 rounding on features up to 1e10 makes it a tail risk. Guard the gate.</li>
+<li><strong>More data does not help.</strong> 4× the training rows bought 1.71%. The ceiling
+is the data, not the learner or the sample size.</li>
+<li><strong>LOIC-UDP anomaly unresolved</strong> (from the audit): 1,730 flows all on port 80 with
+ACK ≈ 0.96 — likely mislabeled TCP. The class was dropped, so it does not affect results,
+but it remains a data-integrity flag.</li>
+</ol>
+
+<h2>9. Next steps</h2>
+<table>
+<thead><tr><th>Priority</th><th>Action</th><th>Why</th></tr></thead>
+<tbody>
+<tr><td class="name"><span class="tag">1</span></td><td>pcap replay harness</td><td>Chosen over DPDK live capture; exercises the real scoring path end to end</td></tr>
+<tr><td class="name"><span class="tag">2</span></td><td>FastAPI scoring service + float32 guard</td><td>Must apply the gate outside the graph, read the feature order from <code>onnx_card.json</code>, batch flows, and re-score near-τ rows via joblib</td></tr>
+<tr><td class="name"><span class="tag">3</span></td><td>Low-confidence-Flood review queue</td><td>Recovers most of the 3,389 Flood misses without reopening the FPR</td></tr>
+<tr><td class="name"><span class="tag">4</span></td><td>TimescaleDB + Grafana, then React</td><td>Alert sink and operator surface</td></tr>
+<tr><td class="name"><span class="tag">5</span></td><td>Engineer <code>is_header_only</code>, byte/packet ratios, <code>log(Duration)</code></td><td>Hulk is 82% header-only. The only lever that could move the Flood ceiling</td></tr>
+<tr><td class="name"><span class="tag">6</span></td><td>Cross-dataset test on CSE-CIC-IDS2018</td><td>The only real test of generalisation, given limitation #1</td></tr>
+</tbody></table>
+
+<div class="foot">
+<strong>Reproduce:</strong>
+<code>1_filter_clean.py</code> → <code>3_verify.py</code> → <code>2_train_split.py</code> →
+<code>train_model.py</code> → <code>ablate.py</code> → <code>fingerprints.py</code> →
+<code>train_family.py</code> → <code>compare_models.py</code> →
+<code>tune_threshold.py</code> → <code>threshold_decision.py</code> →
+<code>deploy_model.py</code> → <code>export_onnx.py</code> → <code>verify_deploy.py</code><br>
+<strong>Artifacts:</strong> <code>data_out/filter_report.json</code>,
+<code>data_out/splits/split_report.json</code>, <code>reports/model/metrics.json</code>,
+<code>reports/ablation/ablation.json</code>, <code>reports/fingerprints/fingerprints.csv</code>,
+<code>reports/family/family_report.json</code>, <code>reports/compare/compare_report.json</code>,
+<code>reports/threshold/threshold_report.json</code>,
+<code>reports/threshold/threshold_sweep.npz</code>,
+<code>reports/deploy/model_card.json</code>, <code>reports/deploy/onnx_card.json</code><br>
+All figures trace to generated JSON/CSV or to console output reproduced verbatim.
+Leakage columns (<code>Dst Port</code>, <code>Protocol</code>,
+<code>Day/Hour/Minute/Second</code>) are excluded from every feature set by design.
+See <code>RUNBOOK.md</code> for the deployment commands and <code>PROJECT_STATUS.md</code>
+§5 for the corrections log.
+</div>
+
+</div>
+</body>
+</html>
